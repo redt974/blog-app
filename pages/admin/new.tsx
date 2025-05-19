@@ -62,14 +62,19 @@ export default function NewPost() {
             className="w-full border p-2 rounded"
             required
           />
-          <input
-            type="text"
-            placeholder="Catégorie (VTT, Tennis, etc.)"
+          <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             className="w-full border p-2 rounded"
             required
-          />
+          >
+            <option value="">Sélectionner une catégorie</option>
+            <option value="VTT">VTT</option>
+            <option value="Basket">Basket</option>
+            <option value="Boule">Boule</option>
+            <option value="Tennis">Tennis</option>
+            <option value="Gym">Gymnastique</option>
+          </select>
           <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
             Publier
           </button>
