@@ -1,41 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# blog-app
 
-## Getting Started
+## Initialiser le repôt :
 
-First, run the development server:
+- Installer les dépendances : `npm i`,
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Avoir la BDD Prisma : `npx prisma generate`,
+
+- Créer le fichier `.env` :
+
+```
+DATABASE_URL="postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public"
+GITHUB_ID=
+GITHUB_SECRET=
+NEXTAUTH_SECRET=
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Configuer l'Auth avec Github :
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+- Va sur GitHub Developer Settings : 🔗 https://github.com/settings/developers
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+- Clique sur "OAuth Apps" → puis "New OAuth App"
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+- Renseigne :
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+    -> Application name : Site Club Pierrelaye
 
-## Learn More
+    -> Homepage URL : http://localhost:3000 (ou l’URL de ton site en prod)
 
-To learn more about Next.js, take a look at the following resources:
+    -> Authorization callback URL :
+        ➜ http://localhost:3000/api/auth/callback/github
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+    -> Clique sur Register application
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- GitHub te donne :
 
-## Deploy on Vercel
+    -> Client ID = GITHUB_ID
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    -> Clique sur "Generate a new client secret" → Client Secret = GITHUB_SECRET
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
-# blog-app
+## Configuer l'Auth Next :
+
+Aller sur un site de générateur de mot de passe aléatoire [Exemple](https://www.dashlane.com/fr/features/password-generator)
+
+Et copier/coller le "le mot de passe" générée en tant que clé secrète.
+
+## Lancer l'application :
+
+- Lancer l'application Next.js :  `npx run dev`
+- Lancer l'interface web de Prisma : `npx prisma studio`
