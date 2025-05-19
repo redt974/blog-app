@@ -99,6 +99,7 @@ export default function EditPost({ post }: Props) {
             <option value="Basket">Basket</option>
             <option value="Boule">Boule</option>
             <option value="Tennis">Tennis</option>
+            <option value="Gym">Gymnastique</option>
           </select>
           <div className="flex gap-2">
             <button

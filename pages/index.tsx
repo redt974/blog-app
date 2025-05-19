@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import Layout from "@/components/Layout";
 import SearchBar from "@/components/SearchBar";
 import Link from "next/link";
+import Slider from "@/components/SportsSlider"
 
 type Post = {
   id: number;
@@ -73,8 +74,8 @@ export default function Home({ posts }: Props) {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto py-10 px-4 space-y-8">
-        <h1 className="text-4xl font-bold text-center text-gray-800">
+        <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-10">
+        <h1 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700 mb-2">
           Dernières annonces
         </h1>
 
@@ -85,27 +86,35 @@ export default function Home({ posts }: Props) {
         />
 
         {/* Filtre par catégorie */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           <label
             htmlFor="category"
             className="text-base font-medium text-gray-700"
           >
             Filtrer par catégorie :
           </label>
-          <select
-            id="category"
-            value={selectedCategory}
-            onChange={(e) => handleCategoryChange(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Toutes</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              id="category"
+              value={selectedCategory}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+              className="appearance-none bg-white w-full pl-4 pr-10 py-2.5 border-0 rounded-lg text-gray-700 font-medium shadow-sm ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-200"
+            >
+              <option value="">Toutes</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+              <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </div>
+          </div>
         </div>
+
 
         {/* Résultats */}
         <div className="space-y-6">
@@ -113,30 +122,33 @@ export default function Home({ posts }: Props) {
             searchResults.map((post) => (
               <div
                 key={post.id}
-                className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-5"
+                className="group bg-white border-0 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6 relative overflow-hidden"
               >
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
+                <div className="ml-3">
                 <Link href={`/posts/${post.id}`}>
-                  <h2 className="text-2xl font-semibold text-blue-700 hover:underline cursor-pointer">
+                  <h2 className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-200 group-hover:translate-x-0.5 transform transition-transform">
                     {post.title}
                   </h2>
                 </Link>
-                <p className="text-gray-600 mt-2 text-sm leading-relaxed">
+                <p className="text-gray-600 mt-3 text-base leading-relaxed line-clamp-2">
                   {post.content.slice(0, 150)}
                 </p>
-                <p className="mt-3 text-sm text-gray-500">
+                <div className="mt-4 flex items-center">
                   Catégorie :{" "}
-                  <span className="font-semibold text-gray-800">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
                     {post.category}
                   </span>
-                </p>
+                </div>
 
                 {session?.user && (
-                  <div className="mt-4 flex gap-6 text-sm">
+                  <div className="mt-5 flex gap-4">
                     <Link
                       href={`/admin/edit/${post.id}`}
-                      className="text-green-600 hover:underline hover:text-green-800 transition"
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors duration-200"
                     >
-                      ✏️ Modifier
+                       <span className="w-5 h-5 inline-flex items-center justify-center rounded-full bg-emerald-100">✏️</span>
+                       Modifier
                     </Link>
                     <button
                       onClick={async () => {
@@ -145,21 +157,27 @@ export default function Home({ posts }: Props) {
                         });
                         window.location.reload();
                       }}
-                      className="text-red-600 hover:underline hover:text-red-800 transition"
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-rose-600 hover:text-rose-800 transition-colors duration-200"
                     >
-                      🗑 Supprimer
+                      <span className="w-5 h-5 inline-flex items-center justify-center rounded-full bg-rose-100">🗑</span>
+                       Supprimer
                     </button>
                   </div>
                 )}
               </div>
+            </div>
             ))
           ) : (
-            <p className="text-gray-500 text-center italic">
-              Aucune annonce disponible.
-            </p>
+            <div className="text-center py-12 px-4 rounded-xl bg-gray-50 border border-gray-100">
+              <p className="text-gray-500 text-lg font-medium">
+                Aucune annonce disponible.
+              </p>
+            </div>
           )}
         </div>
       </div>
+      
+      <Slider/>
     </Layout>
-  );
+    );
 }
