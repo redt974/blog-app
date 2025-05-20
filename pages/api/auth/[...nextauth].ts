@@ -2,10 +2,10 @@ import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GitHubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google"
-import AppleProvider from "next-auth/providers/apple"
+// import AppleProvider from "next-auth/providers/apple"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
-import jwt from "jsonwebtoken"
+// import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs"
 
 // // Generate Apple client secret string
@@ -44,11 +44,17 @@ export const authOptions = {
 
         if (user && user.password && credentials?.password) {
           const isValid = await bcrypt.compare(credentials.password, user.password)
-          if (isValid) return user
+
+          if (isValid) {
+            if (!user.emailVerified) {
+              throw new Error("Email non vérifié")
+            }
+            return user
+          }
         }
 
         return null
-      },
+      }
     }),
 
     GoogleProvider({

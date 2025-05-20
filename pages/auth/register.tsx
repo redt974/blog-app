@@ -13,7 +13,7 @@ export default function RegisterPage() {
 
     const form = e.currentTarget
     const formData = {
-      name: form.name.value,
+      name: form.name.valueOf,
       email: form.email.value,
       password: form.password.value,
     }
@@ -34,7 +34,7 @@ export default function RegisterPage() {
       return
     }
 
-    router.push("/auth/login")
+    router.push("/auth/login?verify=email")
   }
 
   return (
