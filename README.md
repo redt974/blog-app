@@ -28,6 +28,7 @@ GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 
 # NextAuth
+NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=
 
 # Envoi d’e-mails via Gmail
