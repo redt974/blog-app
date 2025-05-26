@@ -86,7 +86,32 @@ export const authOptions = {
       })
 
       // S'il y a déjà un utilisateur, on connecte l'account OAuth à ce user
-      if (existingUser) {
+      if (!existingUser) {
+        // Nouveau compte via Google → on crée l'utilisateur avec son nom
+        await prisma.user.create({
+          data: {
+            email: user.email!,
+            name: profile?.name ?? `${profile?.given_name ?? ""} ${profile?.family_name ?? ""}`,
+            emailVerified: new Date(),
+            image: profile?.picture,
+            accounts: {
+              create: {
+                type: account.type,
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+                access_token: account.access_token,
+                token_type: account.token_type,
+                scope: account.scope,
+                id_token: account.id_token,
+                session_state: account.session_state,
+                expires_at: account.expires_at,
+                refresh_token: account.refresh_token,
+              },
+            },
+          },
+        })
+      } else {
+        // Si l'utilisateur existe déjà, on met à jour ou crée son compte OAuth (comme tu faisais)
         await prisma.account.upsert({
           where: {
             provider_providerAccountId: {

@@ -9,7 +9,7 @@
 - Créer le fichier `.env` :
 
 ```
-DATABASE_URL="postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public"
+DATABASE_URL="mysql://root:@localhost:3306/blog-app"
 GITHUB_ID=
 GITHUB_SECRET=
 NEXTAUTH_SECRET=
