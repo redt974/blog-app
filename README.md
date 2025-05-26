@@ -28,7 +28,6 @@ GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 
 # NextAuth
-NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=
 
 # Envoi d’e-mails via Gmail
@@ -86,12 +85,24 @@ GMAIL_USE_TLS=true
 
 ## 📧 Configuration de Gmail pour l’envoi d’e-mails
 
-1. Active la validation en 2 étapes sur ton compte Gmail
+### 1. Activer la validation en deux étapes (obligatoire)
 
-2. Crée un mot de passe d'application depuis
-   [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+Avant de générer un mot de passe d’application, tu dois activer la validation en deux étapes sur ton compte Gmail :
 
-3. Copie ce mot de passe et configure dans `.env` :
+* Va sur : [https://myaccount.google.com/security](https://myaccount.google.com/security)
+* Dans la section **"Connexion à Google"**, clique sur **"Validation en deux étapes"**
+* Suis les étapes pour l’activer (téléphone + SMS ou app Google Authenticator)
+
+### 2. Générer un mot de passe d’application Gmail
+
+Une fois la 2FA activée :
+
+* Va sur : [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+* Choisis **"Sélectionner une application" → Autre (personnalisée)** → mets par ex. "blog-app"
+* Clique sur **Générer**
+* Copie le mot de passe généré
+
+### 3. Remplir les variables dans `.env`
 
 ```env
 GMAIL_USER=votreadresse@gmail.com
