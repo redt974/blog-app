@@ -30,9 +30,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const token = randomBytes(32).toString("hex")
   const expires = new Date(Date.now() + 1000 * 60 * 60 * 24) // 24h
 
-  await prisma.verificationToken.create({
+  await prisma.emailVerificationToken.create({
     data: {
-      identifier: email,
+      email,
       token,
       expires,
     },
