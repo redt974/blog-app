@@ -12,17 +12,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative flex items-center justify-between h-16">
             {/* Logo */}
-            <Link
-              href="/"
-              className="flex items-center space-x-2 text-white transform hover:scale-105 transition-transform duration-200"
-            >
-              <img
-                src="/C.S.P.png"
-                alt="Logo CSP"
-                className="w-10 h-10 object-contain"
-              />
-              <span className="font-bold text-lg tracking-tight">Club Sportif de Pierrelaye</span>
-            </Link>
+            <Link 
+  href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"
+  className="flex items-center space-x-2 text-white transform hover:scale-105 transition-transform duration-200"
+   rel="stylesheet"
+>
+ 
+  
+
+  <img 
+    src="/C.S.P.png" 
+    alt="Logo CSP" 
+    className="w-10 h-10 object-contain"
+  />
+  <span className="font-bold text-lg tracking-tight">Club Sportif de Pierrelaye</span>
+</Link>
+
 
             {/* Navigation */}
             <div className="flex items-center space-x-6">

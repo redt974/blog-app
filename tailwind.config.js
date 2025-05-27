@@ -7,4 +7,17 @@ export default {
     extend: {},
   },
   plugins: [],
+
+ 
+
+}
+
+ module.exports = {
+  theme: {
+    extend: {
+      fontFamily: {
+        libre: ['"Libre Baskerville"', 'serif'],
+      },
+    },
+  },
 }
