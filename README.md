@@ -164,8 +164,6 @@ npm install typescript ts-node @types/node --save-dev
 npx tsc --init
 ```
 
-> Tu peux aussi rester en JavaScript si tu préfères.
-
 ---
 
 ### 4. 📝 Crée le fichier `hash-email.ts`
