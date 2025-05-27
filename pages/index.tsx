@@ -75,7 +75,7 @@ export default function Home({ posts }: Props) {
   return (
     <Layout>
         <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-10">
-        <h1 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700 mb-2">
+        <h1 className="text-4xl font-libre text-white">
           Dernières annonces
         </h1>
 
