@@ -2,8 +2,8 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { GithubIcon } from "lucide-react";
-import { Mail, Lock, User, Github } from "lucide-react";
+import { GithubIcon, Mail, Lock } from "lucide-react";
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -78,12 +78,12 @@ export default function LoginPage() {
               />
             </div>
             <div className="text-right">
-              <button
-                type="button"
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                Mot de passe oublié ?
-              </button>
+              <a
+              href="/auth/forgot-password"
+              className="text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Mot de passe oublié ?
+            </a>
             </div>
           </div>
 
@@ -96,29 +96,26 @@ export default function LoginPage() {
             Se connecter
           </motion.button>
 
+          <div className="relative flex items-center justify-center mt-1">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative px-4 bg-white text-sm text-gray-500">
+              ou continuer avec
+            </div>
+          </div>
+
           <div className="space-y-3 pt-3">
-            <button
+            <button 
               type="button"
-              onClick={() => signIn("google", { callbackUrl: "/" })}
-              className="w-full h-11 px-4 py-2 bg-white text-black border border-input rounded-md font-medium flex items-center justify-center gap-2 transition-colors hover:bg-slate-50"
+               onClick={() => signIn("google", { callbackUrl: "/" })}
+              className="w-full flex justify-center items-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
-              <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-                <path
-                  d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0353 3.12C17.9503 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70998C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z"
-                  fill="#EA4335"
-                />
-                <path
-                  d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z"
-                  fill="#4285F4"
-                />
-                <path
-                  d="M5.26498 14.29C5.02498 13.57 4.88501 12.8 4.88501 12C4.88501 11.2 5.01998 10.43 5.26498 9.71001L1.275 6.61C0.46 8.23 0 10.06 0 12C0 13.94 0.46 15.77 1.28 17.39L5.26498 14.29Z"
-                  fill="#FBBC05"
-                />
-                <path
-                  d="M12.0004 24C15.2404 24 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.2654 14.285L1.27539 17.385C3.25539 21.31 7.3104 24 12.0004 24Z"
-                  fill="#34A853"
-                />
+              <svg width="20" height="20" viewBox="0 0 48 48">
+                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
+                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
+                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
               </svg>
               Connexion avec Google
             </button>

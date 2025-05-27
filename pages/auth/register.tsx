@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Mail, Lock, User, Github } from 'lucide-react';
-import { useSession, signIn,  } from "next-auth/react"
+import { signIn } from "next-auth/react"
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null)
