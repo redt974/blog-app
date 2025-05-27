@@ -1,12 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import { prisma } from "../../../lib/prisma"
+import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]"
+import { isAdmin } from "@/lib/auth/is-admin"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
-  if (!session) {
+  if (!session || !isAdmin(session)) {
     return res.status(401).json({ message: "Non autorisé" })
   }
 
@@ -26,11 +27,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         const updatedPost = await prisma.post.update({
-          where: { id: postId },
-          data: { title, content },
-        })
-
-        await prisma.post.update({
           where: { id: postId },
           data: { title, content, category },
         })

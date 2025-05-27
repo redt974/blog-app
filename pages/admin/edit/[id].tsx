@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import Layout from "@/components/Layout"
 import { useSession, getSession } from "next-auth/react"
 import { GetServerSideProps } from "next"
+import { isAdmin } from "@/lib/auth/is-admin"
 
 type Props = {
   post: {
@@ -17,10 +18,10 @@ type Props = {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context)
 
-  if (!session) {
+  if (!session || !isAdmin(session)) {
     return {
       redirect: {
-        destination: "/api/auth/signin",
+        destination: "/",
         permanent: false,
       },
     }

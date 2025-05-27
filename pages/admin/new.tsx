@@ -2,24 +2,9 @@ import { useState } from "react"
 import { useRouter } from "next/router"
 import Layout from "@/components/Layout"
 import { useSession, getSession } from "next-auth/react"
-import { GetServerSideProps } from "next"
+import { useAdminRedirect } from "@/lib/hooks/use-admin-redirect"
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context)
-
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/api/auth/signin",
-        permanent: false,
-      },
-    }
-  }
-
-  return {
-    props: {}, // On continue si l’utilisateur est connecté
-  }
-}
+useAdminRedirect()
 
 export default function NewPost() {
   const { data: session, status } = useSession()

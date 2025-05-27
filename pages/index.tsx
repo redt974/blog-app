@@ -1,11 +1,12 @@
 import { GetServerSideProps } from "next";
-import { prisma } from "../lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import Layout from "@/components/Layout";
 import SearchBar from "@/components/SearchBar";
 import Link from "next/link";
 import Slider from "@/components/SportsSlider"
+import useIsAdmin from "@/lib/hooks/use-is-admin";
 
 type Post = {
   id: number;
@@ -35,6 +36,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 export default function Home({ posts }: Props) {
+  const isAdmin = useIsAdmin();
   const { data: session } = useSession();
 
   // États pour la recherche et le filtre catégorie
@@ -74,7 +76,7 @@ export default function Home({ posts }: Props) {
 
   return (
     <Layout>
-        <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-10">
+      <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-10">
         <h1 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700 mb-2">
           Dernières annonces
         </h1>
@@ -126,46 +128,46 @@ export default function Home({ posts }: Props) {
               >
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
                 <div className="ml-3">
-                <Link href={`/posts/${post.id}`}>
-                  <h2 className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-200 group-hover:translate-x-0.5 transform transition-transform">
-                    {post.title}
-                  </h2>
-                </Link>
-                <p className="text-gray-600 mt-3 text-base leading-relaxed line-clamp-2">
-                  {post.content.slice(0, 150)}
-                </p>
-                <div className="mt-4 flex items-center">
-                  Catégorie :{" "}
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
-                    {post.category}
-                  </span>
-                </div>
-
-                {session?.user && (
-                  <div className="mt-5 flex gap-4">
-                    <Link
-                      href={`/admin/edit/${post.id}`}
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors duration-200"
-                    >
-                       <span className="w-5 h-5 inline-flex items-center justify-center rounded-full bg-emerald-100">✏️</span>
-                       Modifier
-                    </Link>
-                    <button
-                      onClick={async () => {
-                        await fetch(`/api/posts/${post.id}`, {
-                          method: "DELETE",
-                        });
-                        window.location.reload();
-                      }}
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-rose-600 hover:text-rose-800 transition-colors duration-200"
-                    >
-                      <span className="w-5 h-5 inline-flex items-center justify-center rounded-full bg-rose-100">🗑</span>
-                       Supprimer
-                    </button>
+                  <Link href={`/posts/${post.id}`}>
+                    <h2 className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-200 group-hover:translate-x-0.5 transform transition-transform">
+                      {post.title}
+                    </h2>
+                  </Link>
+                  <p className="text-gray-600 mt-3 text-base leading-relaxed line-clamp-2">
+                    {post.content.slice(0, 150)}
+                  </p>
+                  <div className="mt-4 flex items-center">
+                    Catégorie :{" "}
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                      {post.category}
+                    </span>
                   </div>
-                )}
+
+                  {session?.user && isAdmin && (
+                    <div className="mt-5 flex gap-4">
+                      <Link
+                        href={`/admin/edit/${post.id}`}
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors duration-200"
+                      >
+                        <span className="w-5 h-5 inline-flex items-center justify-center rounded-full bg-emerald-100">✏️</span>
+                        Modifier
+                      </Link>
+                      <button
+                        onClick={async () => {
+                          await fetch(`/api/posts/${post.id}`, {
+                            method: "DELETE",
+                          });
+                          window.location.reload();
+                        }}
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-rose-600 hover:text-rose-800 transition-colors duration-200"
+                      >
+                        <span className="w-5 h-5 inline-flex items-center justify-center rounded-full bg-rose-100">🗑</span>
+                        Supprimer
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
             ))
           ) : (
             <div className="text-center py-12 px-4 rounded-xl bg-gray-50 border border-gray-100">
@@ -176,8 +178,7 @@ export default function Home({ posts }: Props) {
           )}
         </div>
       </div>
-      
-      <Slider/>
+      <Slider />
     </Layout>
-    );
+  );
 }
