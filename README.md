@@ -8,16 +8,20 @@
 npm install
 ```
 
-2. **Générer le client Prisma :**
+2. **Générer le client Prisma et Récupérer les migrations:**
 
 ```bash
 npx prisma generate
+npx prisma migrate dev --name init
 ```
 
 3. **Créer le fichier `.env` à la racine :**
 
 ```env
 DATABASE_URL="mysql://root:@localhost:3306/blog-app"
+
+# Admin credentials
+ADMIN_EMAIL_HASH=
 
 # Authentification GitHub
 GITHUB_ID=
@@ -139,8 +143,87 @@ npx prisma studio
 
 ---
 
+**Génération du hash d'email admin** :
+
+## 🛠️ Étapes pour créer un projet Node.js de hash d’email
+
+### 1. 📁 Crée un dossier
+
+```bash
+mkdir hash-email && cd hash-email
+```
+
+### 2. 📦 Initialise un projet Node
+
+```bash
+npm init -y
+```
+
+### 3. 🛠️ Installe TypeScript (optionnel mais recommandé)
+
+```bash
+npm install typescript ts-node @types/node --save-dev
+npx tsc --init
+```
+
+> Tu peux aussi rester en JavaScript si tu préfères.
+
+---
+
+### 4. 📝 Crée le fichier `hash-email.ts`
+
+```bash
+touch hash-email.ts
+```
+
+Colle dedans :
+
+```ts
+import { createHash } from "crypto"
+import readline from "readline"
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+})
+
+rl.question("Entrez l'email à hasher (ex: admin@example.com) : ", (email) => {
+  const hash = createHash("sha256").update(email.toLowerCase().trim()).digest("hex")
+  console.log(`\n✅ Hash SHA-256 :\n${hash}\n`)
+  rl.close()
+})
+```
+
+---
+
+### 5. ▶️ Lance le script
+
+```bash
+npx ts-node hash-email.ts
+```
+
+Tu verras :
+
+```
+Entrez l'email à hasher (ex: admin@example.com) : admin@example.com
+
+✅ Hash SHA-256 :
+2e40174d68d208e69c3f7076502a3e88ae6c0c1b8a10ff237f4152e9d153ab0f
+```
+
+---
+
+### ✅ Tu peux maintenant copier ce hash dans ton fichier `.env` :
+
+```env
+ADMIN_HASH = "2e40174d68d208e69c3f7076502a3e88ae6c0c1b8a10ff237f4152e9d153ab0f"
+```
+
+---
+
 ## ✅ Fonctionnalités intégrées
 
+* Authentification en admin
 * Authentification GitHub et Google via NextAuth
 * Réinitialisation de mot de passe par email
 * Emails envoyés via SMTP Gmail
