@@ -143,9 +143,7 @@ npx prisma studio
 
 ---
 
-**Génération du hash d'email admin** :
-
-## 🛠️ Étapes pour créer un projet Node.js de hash d’email
+## 🛠️ **Génération du hash d'email admin** :
 
 ### 1. 📁 Crée un dossier
 
