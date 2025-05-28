@@ -8,6 +8,7 @@ import { isAdminFromSession } from "@/lib/auth/is-admin";
 import useIsAdmin from "@/lib/hooks/use-is-admin";
 import { motion } from "framer-motion"
 import { Pencil, Trash2 } from "lucide-react"
+import Loader from "@/components/Loader"
 
 type Props = {
   post: {
