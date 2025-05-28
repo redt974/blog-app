@@ -13,16 +13,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="relative flex items-center justify-between h-16">
             {/* Logo */}
             <Link
-              href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"
+              href="/"
               className="flex items-center space-x-2 text-white transform hover:scale-105 transition-transform duration-200"
               rel="stylesheet"
             >
               <img
-                src="/C.S.P.png"
+                src="/C.S.P-removebg-preview.png"
                 alt="Logo CSP"
                 className="w-10 h-10 object-contain"
               />
-              <span className="font-bold text-lg tracking-tight">Club Sportif de Pierrelaye</span>
+              <span className="font-bold text-lg tracking-tight text-black">Club Sportif de Pierrelaye</span>
             </Link>
 
             {/* Navigation */}
@@ -30,10 +30,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {session?.user && isAdmin && (
                 <Link
                   href="/admin/new"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full 
-               text-white bg-blue-500 hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 
-               focus:ring-blue-400 transition-colors duration-200 shadow-sm hover:shadow-md"
-                >
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full 
+text-white bg-yellow-500 hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-offset-2 
+focus:ring-yellow-400 transition-colors duration-200 shadow-sm hover:shadow-md">
                   <span className="mr-2">+</span>
                   Ajouter
                 </Link>

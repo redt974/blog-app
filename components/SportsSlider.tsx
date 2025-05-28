@@ -100,9 +100,10 @@ export default function SportsSlider() {
       </div>
 
       <div className="relative z-10 max-w-[95vw] mx-auto px-4 xl:px-0 pt-8 md:pt-16 pb-12 md:pb-20">
-        <h2 className="text-4xl md:text-5xl xl:text-6xl font-extrabold text-center mb-12 md:mb-16 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700 tracking-tight">
-          Nos Activités Sportives
-        </h2>
+       <h2 className="text-4xl md:text-5xl xl:text-6xl font-extrabold font-libre text-center mb-12 md:mb-16 text-black tracking-tight">
+  Nos Activités Sportives
+</h2>
+
 
         <div className="relative">
           <Swiper
