@@ -13,7 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="relative flex items-center justify-between h-16">
             {/* Logo */}
             <Link
-              href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"
+              href="/"
               className="flex items-center space-x-2 text-white transform hover:scale-105 transition-transform duration-200"
               rel="stylesheet"
             >
