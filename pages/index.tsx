@@ -77,8 +77,8 @@ export default function Home({ posts }: Props) {
   return (
     <Layout>
         <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-10">
-        <h1 className="text-4xl font-libre text-white">
-          Dernières annonces
+        <h1 className="text-4xl font-bold font-libre text-black">
+           Dernières annonces
         </h1>
 
         {/* Barre de recherche */}
