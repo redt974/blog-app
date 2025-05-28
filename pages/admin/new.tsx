@@ -1,18 +1,25 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import Layout from "@/components/Layout"
-import { useSession, getSession } from "next-auth/react"
-import { useAdminRedirect } from "@/lib/hooks/use-admin-redirect"
-
-useAdminRedirect()
+import useIsAdmin from "@/lib/hooks/use-is-admin"
+import Loader from "@/components/Loader";
 
 export default function NewPost() {
-  const { data: session, status } = useSession()
+  const isAdmin = useIsAdmin();
   const router = useRouter()
 
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
   const [category, setCategory] = useState("")
+
+  useEffect(() => {
+    if (isAdmin === false) {
+      router.push("/");
+    }
+  }, [isAdmin]);
+
+  if (isAdmin === null) return <Loader/>;
+  if (isAdmin === false) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -23,9 +30,6 @@ export default function NewPost() {
     })
     router.push("/")
   }
-
-  if (status === "loading") return <Layout>Chargement...</Layout>
-  if (status === "unauthenticated") router.push("/api/auth/signin")
 
   return (
     <Layout>

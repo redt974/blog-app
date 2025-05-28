@@ -212,7 +212,7 @@ Entrez l'email à hasher (ex: admin@example.com) : admin@example.com
 ### ✅ Tu peux maintenant copier ce hash dans ton fichier `.env` :
 
 ```env
-ADMIN_HASH = "2e40174d68d208e69c3f7076502a3e88ae6c0c1b8a10ff237f4152e9d153ab0f"
+ADMIN_EMAIL_HASH = "2e40174d68d208e69c3f7076502a3e88ae6c0c1b8a10ff237f4152e9d153ab0f"
 ```
 
 ---

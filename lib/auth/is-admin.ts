@@ -1,15 +1,19 @@
-import { createHash } from "crypto"
-import { Session } from "next-auth"
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import crypto from "crypto";
+import type { NextApiRequest, NextApiResponse } from "next";
+import type { GetServerSidePropsContext } from "next";
 
-export function hashEmail(email: string) {
-  return createHash("sha256").update(email.toLowerCase().trim()).digest("hex")
+export async function isAdminFromSession(
+  req: NextApiRequest | GetServerSidePropsContext["req"],
+  res: NextApiResponse | GetServerSidePropsContext["res"]
+): Promise<boolean> {
+  const session = await getServerSession(req, res, authOptions);
+
+  const email = session?.user?.email;
+  if (!email) return false;
+
+  const hash = crypto.createHash("sha256").update(email).digest("hex");
+  return hash === process.env.ADMIN_EMAIL_HASH;
 }
 
-export function isAdminFromEmail(email: string | undefined | null): boolean {
-  if (!email) return false
-  return hashEmail(email) === process.env.ADMIN_EMAIL_HASH
-}
-
-export function isAdmin(session: Session | null): boolean {
-  return isAdminFromEmail(session?.user?.email)
-}

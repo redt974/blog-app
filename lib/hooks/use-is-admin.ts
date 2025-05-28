@@ -1,22 +1,14 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
 export default function useIsAdmin() {
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const fetchAdminStatus = async () => {
-      try {
-        const res = await fetch("/api/auth/is-admin")
-        const data = await res.json()
-        setIsAdmin(data.isAdmin)
-      } catch (err) {
-        console.error("Erreur lors de la vérification admin :", err)
-        setIsAdmin(false)
-      }
-    }
+    fetch("/api/auth/admin-check")
+      .then((res) => res.json())
+      .then((data) => setIsAdmin(data.isAdmin))
+      .catch(() => setIsAdmin(false));
+  }, []);
 
-    fetchAdminStatus()
-  }, [])
-
-  return isAdmin
+  return isAdmin;
 }

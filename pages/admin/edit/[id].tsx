@@ -1,10 +1,12 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import { prisma } from "@/lib/prisma"
 import Layout from "@/components/Layout"
-import { useSession, getSession } from "next-auth/react"
+import { getSession } from "next-auth/react"
 import { GetServerSideProps } from "next"
-import { isAdmin } from "@/lib/auth/is-admin"
+import { isAdminFromSession } from "@/lib/auth/is-admin";
+import useIsAdmin from "@/lib/hooks/use-is-admin";
+import { Loader } from "lucide-react"
 
 type Props = {
   post: {
@@ -16,13 +18,18 @@ type Props = {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const isAdmin = await isAdminFromSession(context.req, context.res);
+  if (!isAdmin) {
+    return { redirect: { destination: "/", permanent: false } };
+  }
+
   const session = await getSession(context)
 
-  if (!session || !isAdmin(session)) {
+  if (!session) {
     return {
       redirect: {
         destination: "/",
-        permanent: false,
+        permanent: false
       },
     }
   }
@@ -46,12 +53,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 }
 
 export default function EditPost({ post }: Props) {
-  const { data: session, status } = useSession()
+  const isAdmin = useIsAdmin();
   const router = useRouter()
 
   const [title, setTitle] = useState(post.title)
   const [content, setContent] = useState(post.content)
   const [category, setCategory] = useState(post.category)
+
+  useEffect(() => {
+    if (isAdmin === false) {
+      router.push("/");
+    }
+  }, [isAdmin]);
+
+  if (isAdmin === null) return <Loader/>;
+  if (isAdmin === false) return null;
+
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -67,9 +84,6 @@ export default function EditPost({ post }: Props) {
     await fetch(`/api/posts/${post.id}`, { method: "DELETE" })
     router.push("/")
   }
-
-  if (status === "loading") return <Layout>Chargement...</Layout>
-  if (status === "unauthenticated") router.push("/api/auth/signin")
 
   return (
     <Layout>

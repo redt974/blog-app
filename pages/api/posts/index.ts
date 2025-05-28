@@ -2,13 +2,16 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../auth/[...nextauth]"
 import { prisma } from "@/lib/prisma"
-import { isAdmin } from "@/lib/auth/is-admin"
+import { isAdminFromSession } from "@/lib/auth/is-admin";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
 
+  const isAdmin = await isAdminFromSession(req, res);
+  if (!isAdmin) return res.status(403).json({ error: "Forbidden" });
+
   if (req.method === "POST") {
-    if (!session || !isAdmin(session)) {
+    if (!session) {
       return res.status(401).json({ message: "Non autorisé" })
     }
 
