@@ -4,14 +4,16 @@ import useIsAdmin from "@/lib/hooks/use-is-admin";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const isAdmin = useIsAdmin();
+
   const { data: session } = useSession()
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="sticky top-0 z-50 bg-gradient-to-r from-blue-600 to-blue-800 relative">
+     <header className="sticky top-0 z-50 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 relative">
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative flex items-center justify-between h-16">
-            {/* Logo */}
+        
             <Link
               href="/"
               className="flex items-center space-x-2 text-white transform hover:scale-105 transition-transform duration-200"
@@ -25,14 +27,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <span className="font-bold text-lg tracking-tight text-black">Club Sportif de Pierrelaye</span>
             </Link>
 
-            {/* Navigation */}
+            
             <div className="flex items-center space-x-6">
               {session?.user && isAdmin && (
                 <Link
                   href="/admin/new"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full 
-                  text-white bg-yellow-500 hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-offset-2 
-                  focus:ring-yellow-400 transition-colors duration-200 shadow-sm hover:shadow-md">
+                  className="text-white bg-yellow-600 hover:shadow-[0_4px_10px_rgba(0,0,0,0.5)] transition-all duration-200 text-sm font-medium px-4 py-2 rounded">
                   <span className="mr-2">+</span>
                   Ajouter
                 </Link>
@@ -41,24 +41,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {session?.user ? (
                 <button
                   onClick={() => signOut()}
-                  className="text-blue-100 hover:text-white transition-colors duration-200 text-sm font-medium
-                  hover:underline decoration-2 underline-offset-4"
+                   className="text-white bg-yellow-600 hover:shadow-[0_4px_10px_rgba(0,0,0,0.5)] transition-all duration-200 text-sm font-medium px-4 py-2 rounded"
                 >
                   Déconnexion
                 </button>
               ) : (
                 <button
                   onClick={() => signIn()}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium 
-                  rounded-full text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 
-                  focus:ring-offset-2 focus:ring-blue-400 transition-all duration-200 shadow-sm hover:shadow-md"
+                  className="text-white bg-yellow-600 hover:shadow-[0_4px_10px_rgba(0,0,0,0.5)] transition-all duration-200 text-sm font-medium px-4 py-2 rounded"
                 >
                   Connexion
                 </button>
               )}
             </div>
 
-            {/* Decorative bottom border */}
+            
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 opacity-50"></div>
           </div>
         </div>
@@ -68,7 +65,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      {/* Footer Apple-style */}
+      
       <footer className="bg-gray-100 text-gray-800 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 text-sm">

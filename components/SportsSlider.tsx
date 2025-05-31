@@ -20,7 +20,7 @@ const sports = [
     schedule: 'Samedi 9h-12h'
   },
   {
-    name: 'Pétanque',
+    name: 'Boule Bretonne',
     description: 'Partagez des moments conviviaux autour de la pétanque',
     image: 'https://www.ville-lomme.fr/var/www/storage/images/mediatheque/mairie-de-lomme/associations/visuels/petanque/229445-1-fre-FR/PETANQUE.jpg',
     schedule: 'Mardi et Jeudi 14h-18h'
@@ -47,7 +47,6 @@ export default function SportsSlider() {
     const checkScreenSize = () => {
       setIsWideScreen(window.innerWidth >= 1024);
     };
-    
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
     return () => window.removeEventListener('resize', checkScreenSize);
@@ -60,34 +59,28 @@ export default function SportsSlider() {
         .swiper-button-prev {
           color: #2563eb !important;
         }
-        
-        @media (min-width: 1024px) {
-          .swiper-button-next {
-            right: 5% !important;
-          }
-          .swiper-button-prev {
-            left: 5% !important;
-          }
+        .swiper-button-next {
+          right: 5% !important;
         }
-
+        .swiper-button-prev {
+          left: 5% !important;
+        }
         .swiper-slide {
           display: flex !important;
           justify-content: center !important;
           align-items: center !important;
-          width: 85vw !important;
-          max-width: 500px !important;
+          width: 75vw !important;
+          max-width: 400px !important;
         }
-
         @media (min-width: 1024px) {
           .swiper-slide {
-            width: 500px !important;
+            width: 400px !important;
           }
         }
-
         @media (min-width: 1536px) {
           .swiper-slide {
-            width: 700px !important;
-            max-width: 700px !important;
+            width: 600px !important;
+            max-width: 600px !important;
           }
         }
       `}</style>
@@ -100,10 +93,9 @@ export default function SportsSlider() {
       </div>
 
       <div className="relative z-10 max-w-[95vw] mx-auto px-4 xl:px-0 pt-8 md:pt-16 pb-12 md:pb-20">
-       <h2 className="text-4xl md:text-5xl xl:text-6xl font-extrabold font-libre text-center mb-12 md:mb-16 text-black tracking-tight">
-  Nos Activités Sportives
-</h2>
-
+        <h2 className="text-4xl md:text-5xl xl:text-6xl font-extrabold font-libre text-center mb-12 md:mb-16 text-black tracking-tight">
+          Nos Activités Sportives
+        </h2>
 
         <div className="relative">
           <Swiper
@@ -126,18 +118,15 @@ export default function SportsSlider() {
               modifier: 1.5,
               slideShadows: true,
             }}
-            pagination={{ 
-              clickable: true,
-              dynamicBullets: true,
-            }}
+            pagination={{ clickable: true, dynamicBullets: true }}
             navigation={true}
             modules={[EffectCoverflow, Pagination, Navigation, Autoplay]}
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-            className="w-full py-8 md:py-12"
+            className="w-full py-4 md:py-6"
           >
             {sports.map((sport, index) => (
               <SwiperSlide key={sport.name}>
-                <div 
+                <div
                   className={`
                     relative group overflow-hidden rounded-2xl shadow-xl 
                     transition-all duration-500 transform 
@@ -146,7 +135,7 @@ export default function SportsSlider() {
                     w-full
                   `}
                 >
-                  <div className="relative h-[520px] w-full">
+                  <div className="relative h-[420px] w-fulln">
                     <img
                       src={sport.image}
                       alt={sport.name}
