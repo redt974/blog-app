@@ -27,6 +27,8 @@ model User {
   image         String?
   password      String?
   isAdmin       Boolean   @default(false) 
+  phone         String?   // pour le téléphone
+  newsletterSubscribed Boolean @default(false)
 
   accounts      Account[]
   sessions      Session[]
@@ -74,4 +76,12 @@ model EmailVerificationToken {
   email     String
   createdAt DateTime @default(now())
   expires   DateTime
+}
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  name      String
+  object    String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
 }

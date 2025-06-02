@@ -2,34 +2,17 @@ import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GitHubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google"
-// import AppleProvider from "next-auth/providers/apple"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
-// import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs"
-
-// // Generate Apple client secret string
-// const now = Math.floor(Date.now() / 1000)
-// const appleClientSecret = jwt.sign(
-//   {
-//     iss: process.env.APPLE_TEAM_ID!,
-//     iat: now,
-//     exp: now + 60 * 60, // 1h de validité
-//     aud: "https://appleid.apple.com",
-//     sub: process.env.APPLE_CLIENT_ID!,
-//   },
-//   process.env.APPLE_PRIVATE_KEY!.replace(/\\n/g, "\n"),
-//   {
-//     algorithm: "ES256",
-//     keyid: process.env.APPLE_KEY_ID!,
-//   }
-// )
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
+
   session: {
     strategy: "jwt",
   },
+
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -54,7 +37,7 @@ export const authOptions = {
         }
 
         return null
-      }
+      },
     }),
 
     GoogleProvider({
@@ -66,11 +49,6 @@ export const authOptions = {
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
     }),
-
-    // AppleProvider({
-    //   clientId: process.env.APPLE_CLIENT_ID!,
-    //   clientSecret: appleClientSecret,
-    // }),
   ],
 
   pages: {
@@ -85,9 +63,7 @@ export const authOptions = {
         where: { email: user.email! },
       })
 
-      // S'il y a déjà un utilisateur, on connecte l'account OAuth à ce user
       if (!existingUser) {
-        // Nouveau compte via Google → on crée l'utilisateur avec son nom
         await prisma.user.create({
           data: {
             email: user.email!,
@@ -111,7 +87,6 @@ export const authOptions = {
           },
         })
       } else {
-        // Si l'utilisateur existe déjà, on met à jour ou crée son compte OAuth (comme tu faisais)
         await prisma.account.upsert({
           where: {
             provider_providerAccountId: {
@@ -138,10 +113,16 @@ export const authOptions = {
 
       return true
     },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.sub
+
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
       }
+      return token
+    },
+
+    async session({ session, token }) {
+      session.user.id = token.id
       return session
     },
 

@@ -57,7 +57,7 @@ export default function SportsSlider() {
       <style jsx global>{`
         .swiper-button-next,
         .swiper-button-prev {
-          color: #2563eb !important;
+          color:rgb(0, 0, 0) !important;
         }
         .swiper-button-next {
           right: 5% !important;
@@ -150,7 +150,7 @@ export default function SportsSlider() {
                           {sport.description}
                         </p>
                         <div className="flex items-center">
-                          <span className="px-6 py-3 rounded-full bg-blue-600/80 text-white font-medium text-sm backdrop-blur-sm border border-white/10 shadow-lg group-hover:bg-blue-500 group-hover:shadow-blue-500/25 transition-all duration-300">
+                          <span className="px-6 py-3 rounded-full bg-yellow-600/80 text-white font-medium text-sm backdrop-blur-sm border border-white/10 shadow-lg group-hover:bg-yellow-500 group-hover:shadow-yellow-500/25 transition-all duration-300">
                             {sport.schedule}
                           </span>
                         </div>
