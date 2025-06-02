@@ -78,6 +78,15 @@ export default function PostPage({ post }: Props) {
 
       <Layout>
         <div className="max-w-3xl mx-auto py-8 px-4">
+          <div className="pt-2 pb-4 mb-6 border-b border-gray-200">
+            <a
+              href="/"
+              className="block text-left text-sm text-blue-600 hover:text-blue-800 transition-colors duration-200"
+            >
+              Retour à l'accueil
+            </a>
+          </div>
+
           {post.imageUrl && (
             <img
               src={post.imageUrl}
