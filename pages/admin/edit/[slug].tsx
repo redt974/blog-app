@@ -15,7 +15,10 @@ type Props = {
     id: number
     title: string
     content: string
+    slug: string
     category: string
+    imageUrl?: string | null
+    pdfUrl?: string | null
   }
 }
 
@@ -36,10 +39,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   }
 
-  const id = context.params?.id
+  const slug = context.params?.slug as string;
   const post = await prisma.post.findUnique({
-    where: { id: Number(id) },
-  })
+    where: { slug },
+  });
 
   if (!post) return { notFound: true }
 
@@ -61,6 +64,11 @@ export default function EditPost({ post }: Props) {
   const [title, setTitle] = useState(post.title)
   const [content, setContent] = useState(post.content)
   const [category, setCategory] = useState(post.category)
+  const [image, setImage] = useState<File | null>(null)
+  const [imageUrl, setImageUrl] = useState<string | null>(post.imageUrl || null)
+  const [pdf, setPdf] = useState<File | null>(null)
+  const [pdfUrl, setPdfUrl] = useState<string | null>(post.pdfUrl || null)
+  const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
@@ -69,32 +77,48 @@ export default function EditPost({ post }: Props) {
     }
   }, [isAdmin]);
 
-  if (isAdmin === null) return <Loader/>;
+  if (isAdmin === null) return <Loader />;
   if (isAdmin === false) return null;
 
+  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    try {
-      await fetch(`/api/posts/${post.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content, category }),
-      })
-      router.push("/")
-    } catch (error) {
-      console.error("Error updating post:", error)
-    } finally {
-      setIsSubmitting(false)
+    if (!image && !imageUrl) {
+      alert("L'image principale est obligatoire.");
+      return;
     }
-  }
+
+    setIsSubmitting(true);
+    const formData = new FormData(e.currentTarget);
+
+    formData.append("title", title);
+    formData.append("content", content);
+    formData.append("category", category);
+    formData.append("filesToDelete", JSON.stringify(filesToDelete));
+    if (image) formData.append("image", image);
+    if (pdf) formData.append("pdf", pdf);
+
+    try {
+      const res = await fetch(`/api/posts/${post.slug}`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Erreur lors de la mise à jour");
+
+      router.push(`/posts/${post.slug}`);
+    } catch (err) {
+      console.error("Erreur de mise à jour :", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleDelete = async () => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer cette annonce ?")) {
       setIsSubmitting(true)
       try {
-        await fetch(`/api/posts/${post.id}`, { method: "DELETE" })
+        await fetch(`/api/posts/${post.slug}`, { method: "DELETE" })
         router.push("/")
       } catch (error) {
         console.error("Error deleting post:", error)
@@ -116,13 +140,13 @@ export default function EditPost({ post }: Props) {
       </Layout>
     )
   }
-  
+
   if (status === "unauthenticated") router.push("/api/auth/signin")
 
   return (
     <Layout>
       <div className="min-h-screen py-12 px-4 sm:px-6 flex items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-600/20 via-background to-background/90">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -130,9 +154,9 @@ export default function EditPost({ post }: Props) {
         >
           <div className="relative overflow-hidden bg-white/80 shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-blue-200/30 p-8 backdrop-blur-md">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600/50 via-blue-400/30 to-transparent"></div>
-            
+
             <div className="space-y-2 text-center mb-8">
-              <motion.h1 
+              <motion.h1
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -145,13 +169,13 @@ export default function EditPost({ post }: Props) {
               </p>
             </div>
 
-            <form onSubmit={handleUpdate} className="space-y-6">
+            <form onSubmit={handleUpdate} encType="multipart/form-data" className="space-y-6">
               <div className="space-y-5">
                 <div className="space-y-2">
                   <label htmlFor="title" className="text-sm font-medium text-blue-900/80 ml-1">
                     Titre
                   </label>
-                  <motion.div 
+                  <motion.div
                     whileTap={{ scale: 0.995 }}
                     className="relative group"
                   >
@@ -172,7 +196,7 @@ export default function EditPost({ post }: Props) {
                   <label htmlFor="content" className="text-sm font-medium text-blue-900/80 ml-1">
                     Contenu
                   </label>
-                  <motion.div 
+                  <motion.div
                     whileTap={{ scale: 0.995 }}
                     className="relative group"
                   >
@@ -192,7 +216,7 @@ export default function EditPost({ post }: Props) {
                   <label htmlFor="category" className="text-sm font-medium text-blue-900/80 ml-1">
                     Catégorie
                   </label>
-                  <motion.div 
+                  <motion.div
                     whileTap={{ scale: 0.995 }}
                     className="relative group"
                   >
@@ -218,6 +242,40 @@ export default function EditPost({ post }: Props) {
                     </div>
                   </motion.div>
                 </div>
+
+                {imageUrl && !image && (
+                  <div className="mb-4">
+                    <label>Image principale existante :</label>
+                    <img src={imageUrl} alt="Image principale" className="max-w-xs" />
+                    <button type="button" onClick={() => { setFilesToDelete([...filesToDelete, imageUrl]); setImageUrl(null); }}>
+                      Supprimer l'image principale
+                    </button>
+                  </div>
+                )}
+
+                {pdfUrl && !pdf && (
+                  <div className="mb-4">
+                    <label>PDF existant :</label>
+                    <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="underline text-blue-600">{pdfUrl.split('/').pop()}</a>
+                    <button type="button" onClick={() => { setFilesToDelete([...filesToDelete, pdfUrl]); setPdfUrl(null); }}>
+                      Supprimer le PDF
+                    </button>
+                  </div>
+                )}
+
+                <input
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={(e) => setImage(e.target.files?.[0] || null)}
+                />
+                <input
+                  type="file"
+                  name="pdf"
+                  accept="application/pdf"
+                  onChange={(e) => setPdf(e.target.files?.[0] || null)}
+                />
+
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-6">
@@ -231,7 +289,7 @@ export default function EditPost({ post }: Props) {
                   <Pencil size={18} />
                   {isSubmitting ? "Enregistrement..." : "Enregistrer"}
                 </motion.button>
-                
+
                 <motion.button
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}

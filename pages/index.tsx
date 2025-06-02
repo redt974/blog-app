@@ -7,12 +7,14 @@ import SearchBar from "@/components/SearchBar";
 import Link from "next/link";
 import Slider from "@/components/SportsSlider"
 import useIsAdmin from "@/lib/hooks/use-is-admin";
+import { getCategoryEmoji } from "@/lib/category-emoji";
 
 type Post = {
   id: number;
   title: string;
   content: string;
   category: string;
+  slug: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -123,14 +125,14 @@ export default function Home({ posts }: Props) {
           {searchResults.length > 0 ? (
             searchResults.map((post) => (
               <div
-                key={post.id}
+                key={post.slug}
                 className="group bg-white border-0 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6 relative overflow-hidden"
               >
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
                 <div className="ml-3">
-                  <Link href={`/posts/${post.id}`}>
+                  <Link href={`/posts/${post.slug}`}>
                     <h2 className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-200 group-hover:translate-x-0.5 transform transition-transform">
-                      {post.title}
+                      {getCategoryEmoji(post.category)} {post.title}
                     </h2>
                   </Link>
                   <p className="text-gray-600 mt-3 text-base leading-relaxed line-clamp-2">
@@ -139,14 +141,14 @@ export default function Home({ posts }: Props) {
                   <div className="mt-4 flex items-center">
                     Catégorie :{" "}
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
-                      {post.category}
+                      {getCategoryEmoji(post.category)} {post.category}
                     </span>
                   </div>
 
                   {session?.user && isAdmin && (
                     <div className="mt-5 flex gap-4">
                       <Link
-                        href={`/admin/edit/${post.id}`}
+                        href={`/admin/edit/${post.slug}`}
                         className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors duration-200"
                       >
                         <span className="w-5 h-5 inline-flex items-center justify-center rounded-full bg-emerald-100">✏️</span>
@@ -154,7 +156,7 @@ export default function Home({ posts }: Props) {
                       </Link>
                       <button
                         onClick={async () => {
-                          await fetch(`/api/posts/${post.id}`, {
+                          await fetch(`/api/posts/${post.slug}`, {
                             method: "DELETE",
                           });
                           window.location.reload();

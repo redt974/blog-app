@@ -13,6 +13,8 @@ export default function NewPost() {
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
   const [category, setCategory] = useState("")
+  const [image, setImage] = useState<File | null>(null)
+  const [pdf, setPdf] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
@@ -21,28 +23,38 @@ export default function NewPost() {
     }
   }, [isAdmin]);
 
-  if (isAdmin === null) return <Loader/>;
+  if (isAdmin === null) return <Loader />;
   if (isAdmin === false) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const formData = new FormData(e.currentTarget);
+
+    formData.append("title", title);
+    formData.append("content", content);
+    formData.append("category", category);
+    formData.append("image", image);
+    formData.append("pdf", pdf);
+
     try {
-      await fetch("/api/posts", {
+      const res = await fetch("/api/posts", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content, category }),
-      })
-      router.push("/")
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Erreur lors de la création du post");
+
+      router.push("/");
     } catch (error) {
-      console.error("Error creating post:", error)
+      console.error("Erreur lors de l'envoi :", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
-
-    if (status === "loading") {
+  if (status === "loading") {
     return (
       <Layout>
         <div className="min-h-screen flex items-center justify-center">
@@ -54,13 +66,13 @@ export default function NewPost() {
       </Layout>
     )
   }
-  
+
   if (status === "unauthenticated") router.push("/api/auth/signin")
 
   return (
     <Layout>
       <div className="min-h-screen py-12 px-4 sm:px-6 flex items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-600/20 via-background to-background/90">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -68,9 +80,9 @@ export default function NewPost() {
         >
           <div className="relative overflow-hidden bg-white/80 shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-blue-200/30 p-8 backdrop-blur-md">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600/50 via-blue-400/30 to-transparent"></div>
-            
+
             <div className="space-y-2 text-center mb-8">
-              <motion.h1 
+              <motion.h1
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -83,13 +95,13 @@ export default function NewPost() {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-6">
               <div className="space-y-5">
                 <div className="space-y-2">
                   <label htmlFor="title" className="text-sm font-medium text-blue-900/80 ml-1">
                     Titre
                   </label>
-                  <motion.div 
+                  <motion.div
                     whileTap={{ scale: 0.995 }}
                     className="relative group"
                   >
@@ -110,7 +122,7 @@ export default function NewPost() {
                   <label htmlFor="content" className="text-sm font-medium text-blue-900/80 ml-1">
                     Contenu
                   </label>
-                  <motion.div 
+                  <motion.div
                     whileTap={{ scale: 0.995 }}
                     className="relative group"
                   >
@@ -130,7 +142,7 @@ export default function NewPost() {
                   <label htmlFor="category" className="text-sm font-medium text-blue-900/80 ml-1">
                     Catégorie
                   </label>
-                  <motion.div 
+                  <motion.div
                     whileTap={{ scale: 0.995 }}
                     className="relative group"
                   >
@@ -156,6 +168,10 @@ export default function NewPost() {
                     </div>
                   </motion.div>
                 </div>
+
+                <input type="file" name="image" accept="image/*" required />
+                <input type="file" name="pdf" accept="application/pdf" />
+
               </div>
 
               <motion.button
