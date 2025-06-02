@@ -40,26 +40,32 @@ export default function Subscriptions() {
   }
 
   return (
-    <div className="max-w-lg">
-      <h1 className="text-2xl font-bold mb-4">Abonnement à la newsletter</h1>
-      <div className="flex items-center justify-between">
-        <span>Recevoir les actualités et communications</span>
-        <Switch
-          checked={enabled}
-          onChange={handleToggle}
-          disabled={loading}
-          className={classNames(
-            enabled ? 'bg-green-600' : 'bg-gray-300',
-            'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none'
-          )}
-        >
-          <span
+    <div className="max-w-2xl">
+      <h1 className="text-3xl font-bold text-black-800 mb-8">Abonnement à la newsletter</h1>
+      
+      <div className="bg-yellow-50 rounded-xl p-6 border border-yellow-200">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-medium text-black-900">Recevoir les actualités et communications</h2>
+            <p className="text-black-700 mt-1">Restez informé des dernières nouvelles et mises à jour</p>
+          </div>
+          <Switch
+            checked={enabled}
+            onChange={handleToggle}
+            disabled={loading}
             className={classNames(
-              enabled ? 'translate-x-6' : 'translate-x-1',
-              'inline-block h-4 w-4 transform rounded-full bg-white transition-transform'
+              enabled ? 'bg-yellow-500' : 'bg-yellow-200',
+              'relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2'
             )}
-          />
-        </Switch>
+          >
+            <span
+              className={classNames(
+                enabled ? 'translate-x-7' : 'translate-x-1',
+                'inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out'
+              )}
+            />
+          </Switch>
+        </div>
       </div>
     </div>
   )

@@ -38,50 +38,62 @@ export default function Credentials() {
   }
 
   return (
-    <>
-      <h1 className="text-2xl font-bold mb-4">Changer de mot de passe</h1>
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
-        <div>
-          <label className="block mb-1">Mot de passe actuel</label>
-          <input
-            type="password"
-            name="currentPassword"
-            value={form.currentPassword}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
-        </div>
-        <div>
-          <label className="block mb-1">Nouveau mot de passe</label>
-          <input
-            type="password"
-            name="newPassword"
-            value={form.newPassword}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
-        </div>
-        <div>
-          <label className="block mb-1">Confirmer le mot de passe</label>
-          <input
-            type="password"
-            name="confirmPassword"
-            value={form.confirmPassword}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
+    <div className="flex flex-col items-center">
+      <h1 className="text-3xl font-bold text-black-800 mb-8 w-full text-center md:text-left">Changer de mot de passe</h1>
+      <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-md mx-auto">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-black-800 mb-2">
+              Mot de passe actuel
+            </label>
+            <input
+              type="password"
+              name="currentPassword"
+              value={form.currentPassword}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg border border-yellow-200 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors bg-yellow-50"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-black-800 mb-2">
+              Nouveau mot de passe
+            </label>
+            <input
+              type="password"
+              name="newPassword"
+              value={form.newPassword}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg border border-yellow-200 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors bg-yellow-50"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-black-800 mb-2">
+              Confirmer le mot de passe
+            </label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg border border-yellow-200 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors bg-yellow-50"
+              required
+            />
+          </div>
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className={`w-full px-6 py-3 text-black-900 font-medium rounded-lg transition-all duration-200 ${
+            loading
+              ? 'bg-yellow-200 cursor-not-allowed'
+              : 'bg-yellow-400 hover:bg-yellow-500 active:transform active:scale-95'
+          }`}
         >
           {loading ? 'Enregistrement…' : 'Sauvegarder'}
         </button>
       </form>
-    </>
+    </div>
   )
 }
