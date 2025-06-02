@@ -105,28 +105,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         let imageUrl = existingPost.imageUrl || null
         let pdfUrl = existingPost.pdfUrl || null
 
-        // Vérifie que imageUrl n’est pas null
-        if (!imageUrl) {
-          return res.status(400).json({ message: "L’image est obligatoire" })
-        }
+        console.log("Traitement des fichiers :", files)
 
         if (files.image) {
           const imageFile = Array.isArray(files.image) ? files.image[0] : files.image
 
-          // Si un champ image est présent mais vide, c’est une erreur
-          if (imageFile.size === 0) {
-            return res.status(400).json({ message: "L’image ne doit pas être vide !" })
-          }
+          const hasValidImage = imageFile.size > 0 && imageFile.originalFilename
 
-          imageUrl = await saveFile(imageFile)
+          if (hasValidImage) {
+            imageUrl = await saveFile(imageFile)
+          } else {
+            console.log("Aucune nouvelle image envoyée, on garde l'existante.")
+            // Ne fais rien : garde `imageUrl` inchangé
+          }
         }
 
         if (files.pdf) {
           const pdfFile = Array.isArray(files.pdf) ? files.pdf[0] : files.pdf
-          if (pdfFile.size > 0) {
+          const hasValidPDF = pdfFile.size > 0 && pdfFile.originalFilename
+
+          if (hasValidPDF) {
             pdfUrl = await saveFile(pdfFile)
           } else {
-            pdfUrl = null // suppression du PDF si fichier vide
+            console.log("Pas de nouveau PDF ou fichier vide, suppression du PDF.")
+            pdfUrl = null // ou garde l’existant selon logique métier
           }
         }
 

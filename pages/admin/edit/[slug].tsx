@@ -106,7 +106,9 @@ export default function EditPost({ post }: Props) {
 
       if (!res.ok) throw new Error("Erreur lors de la mise à jour");
 
-      router.push(`/posts/${post.slug}`);
+      const data = await res.json();
+      const newSlug = data.slug || post.slug;
+      router.push(`/posts/${newSlug}`);
     } catch (err) {
       console.error("Erreur de mise à jour :", err);
     } finally {
