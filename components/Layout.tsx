@@ -70,57 +70,57 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 text-sm">
             <div>
-              <h4 className="font-semibold mb-3">Activités</h4>
-              <ul className="space-y-1">
-                <li>Basket</li>
-                <li>Football</li>
-                <li>Danse</li>
-                <li>Musculation</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Nos Sites</h4>
-              <ul className="space-y-1">
-                <li >Site du basket</li>
-                <li>Site du Tenis</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Infos pratiques</h4>
-              <ul className="space-y-1">
-                <li>Horaires</li>
-                <li>Tarifs</li>
-                <li>Adhésion</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Événements</h4>
-              <ul className="space-y-1">
-                <li>Tournois</li>
-                <li>Stages</li>
-                <li>Compétitions</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Suivez-nous</h4>
-              <ul className="space-y-1">
-                <li>Facebook</li>
-                <li>Instagram</li>
-                <li>YouTube</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Contact</h4>
-              <ul className="space-y-1">
-                <li>Président du CSP</li>
-                <li>Président du VTT</li>
-                <li>Président des Boules bretonne</li>
-                <li>Président du Basket-Ball</li>
-                <li>Président du Tennis</li>
-                <li>Président de la Gym</li>
-              </ul>
-            </div>
-          </div>
+        <h4 className="font-semibold mb-3">Activités</h4>
+        <ul className="space-y-1">
+          <li><a href="https://pierrelaye.fr/animations-et-associations/cs-pierrelaye-basketball" className="text-black-600 hover:underline">Basket</a></li>
+          <li><a href="https://pierrelaye.fr/animations-et-associations/cs-pierrelaye-basketball" className="text-black-600 hover:underline">Tennis</a></li>
+          <li><a href="https://pierrelaye.fr/animations-et-associations/csp-gym-sport-et-convivialite" className="text-black-600 hover:underline">Gym</a></li>
+          <li><a href="https://pierrelaye.fr/animations-et-associations/csp-boules-bretonnes" className="text-black-600 hover:underline">Boule Bretonne</a></li>
+          <li><a href="https://pierrelaye.fr/animations-et-associations/csp-vtt" className="text-black-600 hover:underline">VTT</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 className="font-semibold mb-3">Nos Sites</h4>
+        <ul className="space-y-1">
+          <li><a href="https://www.cspierrelaye-basketball.com" className="text-black-600 hover:underline">Site du basket</a></li>
+          <li><a href="#" className="text-black-600 hover:underline">Site du Tennis</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 className="font-semibold mb-3">Infos pratiques</h4>
+        <ul className="space-y-1">
+          <li>Horaires</li>
+          <li>Tarifs</li>
+          <li>Adhésion</li>
+        </ul>
+      </div>
+      <div>
+        <h4 className="font-semibold mb-3">Suivez-nous</h4>
+        <ul className="space-y-1">
+           <li><a href="https:https://www.facebook.com/PierrelayeBasket" className="text-black-600 hover:underline">Facebook Basket</a></li>
+          <li>Facebook Boule Bretonne</li>
+          <li><a href="https://www.facebook.com/GVPIERRELAYE" className="text-black-600 hover:underline">Facebook GYM Volontaire</a></li>
+
+
+          <li><a href="https://www.facebook.com/cspierrelaye" className="text-black-600 hover:underline">Facebook Tennis</a></li>
+          <li><a href="https://www.instagram.com/cs_pierrelaye_tennis/" className="text-black-600 hover:underline" >Instagram Tennis</a></li>
+          <li><a href="https://www.instagram.com/pierrelayebasketball/" className="text-black-600 hover:underline" >Instagram Basket</a></li>
+          <li>YouTube</li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 className="font-semibold mb-3">Contact</h4>
+        <ul className="space-y-1">
+          <li>Les Président du CSP</li>
+          <li>Les secrétaire du CSP</li>
+          <li>Les Trésorier du CSP</li>
+        </ul>
+      </div>
+
+    </div>
 
           <div className="mt-10 text-center text-xs text-gray-500">
             © {new Date().getFullYear()} Club Sportif de Pierrelaye. Tous droits réservés.
