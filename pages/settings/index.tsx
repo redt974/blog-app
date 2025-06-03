@@ -36,7 +36,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-yellow-50">
-      {/* Mobile Header */}
+      {/* Tel Header */}
       <div className="sticky top-0 z-50 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 relative p-4 flex justify-between items-center">
         <Link
           href="/"
@@ -91,7 +91,7 @@ export default function SettingsPage() {
           </nav>
         </aside>
 
-        {/* Main Content */}
+        {/* Contenu */}
         <main className="flex-1 p-4 md:p-10 max-w-5xl mx-auto w-full">
           <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
             <SectionComponent />

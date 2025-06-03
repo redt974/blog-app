@@ -128,7 +128,7 @@ export default function Home({ posts }: Props) {
                 key={post.slug}
                 className="group bg-white border-0 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6 relative overflow-hidden"
               >
-                <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-yellow-400 to-yellow-600"></div>
                 <div className="ml-3">
                   <Link href={`/posts/${post.slug}`}>
                     <h2 className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-200 group-hover:translate-x-0.5 transform transition-transform">
@@ -140,7 +140,7 @@ export default function Home({ posts }: Props) {
                   </p>
                   <div className="mt-4 flex items-center">
                     Catégorie :{" "}
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-black-700">
                       {getCategoryEmoji(post.category)} {post.category}
                     </span>
                   </div>
