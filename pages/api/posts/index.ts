@@ -13,6 +13,8 @@ export const config = {
   },
 };
 
+const tmpDir = path.join(process.cwd(), ".tmp")
+
 function parseForm(req: NextApiRequest): Promise<{ fields: formidable.Fields; files: formidable.Files }> {
   return new Promise((resolve, reject) => {
     const formidable = require("formidable");
@@ -20,7 +22,7 @@ function parseForm(req: NextApiRequest): Promise<{ fields: formidable.Fields; fi
       multiples: false,
       keepExtensions: true,
       maxFileSize: 20 * 1024 * 1024,
-      uploadDir: path.join(process.cwd(), "public/uploads/tmp"),
+      uploadDir: tmpDir,
       allowEmptyFiles: true,
       minFileSize: 0,
     });
@@ -45,6 +47,16 @@ async function moveFile(oldPath: string, newPath: string) {
   } catch (err) {
     console.error("Erreur déplacement fichier :", err);
     throw err;
+  }
+}
+
+async function cleanupTmpDir() {
+  try {
+    if (fs.existsSync(tmpDir)) {
+      await fs.promises.rm(tmpDir, { recursive: true, force: true })
+    }
+  } catch (err) {
+    console.error("Échec du nettoyage du dossier temporaire :", err)
   }
 }
 
@@ -122,5 +134,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (error) {
     console.error("Erreur API /api/posts:", error);
     return res.status(500).json({ error: "Erreur serveur" });
+  } finally {
+    await cleanupTmpDir()
   }
 }

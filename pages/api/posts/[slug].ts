@@ -27,8 +27,9 @@ function slugify(text: string) {
     .replace(/-+$/, "")
 }
 
+const tmpDir = path.join(process.cwd(), ".tmp")
+
 function parseForm(req: NextApiRequest): Promise<{ fields: formidable.Fields; files: formidable.Files }> {
-  const tmpDir = path.join(process.cwd(), ".tmp")
   fs.mkdirSync(tmpDir, { recursive: true })
 
   const formidable = require("formidable")
@@ -48,7 +49,6 @@ function parseForm(req: NextApiRequest): Promise<{ fields: formidable.Fields; fi
 }
 
 async function cleanupTmpDir() {
-  const tmpDir = path.join(process.cwd(), ".tmp")
   try {
     if (fs.existsSync(tmpDir)) {
       await fs.promises.rm(tmpDir, { recursive: true, force: true })
@@ -72,12 +72,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: "Slug manquant" })
   }
 
-  const { fields, files } = await parseForm(req)
+  let fields: formidable.Fields = {};
+  let files: formidable.Files = {};
+
+  if (req.method === "PUT") {
+    ({ fields, files } = await parseForm(req));
+  }
 
   try {
     switch (req.method) {
       case "PUT": {
-        
+
         // S'assurer que ce sont des strings simples, pas des tableaux
         const titleRaw = fields.title
         const contentRaw = fields.content
@@ -136,7 +141,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           if (url === existingPost.pdfUrl) pdfUrl = null;
           if (url === existingPost.imageUrl) imageUrl = null;
         }
-        
+
         // --- 1) Traitement du fichier image ---
         if (files.image) {
           const imageFile = Array.isArray(files.image) ? files.image[0] : files.image
@@ -221,14 +226,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(200).json(updatedPost)
       }
       case "DELETE": {
-        const uploadDir = path.join(process.cwd(), "public", "uploads", slug)
-        if (fs.existsSync(uploadDir)) {
-          fs.rmSync(uploadDir, { recursive: true, force: true })
+        const slug = req.query.slug as string;
+        if (!slug) {
+          res.status(400).json({ message: "Slug manquant" });
+          return;
         }
 
-        await prisma.post.delete({ where: { slug } })
-        return res.status(204).end()
+        try {
+          const uploadDir = path.join(process.cwd(), "public", "uploads", slug);
+          console.log("Tentative suppression du dossier :", uploadDir);
+
+          if (fs.existsSync(uploadDir)) {
+            await fs.promises.rm(uploadDir, { recursive: true, force: true });
+            console.log("Dossier supprimé :", uploadDir);
+          } else {
+            console.log("Dossier introuvable :", uploadDir);
+          }
+
+          await prisma.post.delete({ where: { slug } });
+
+          res.status(204).end(); // Ne pas faire "return"
+        } catch (err) {
+          console.error("Erreur suppression dossier ou post :", err);
+          res.status(500).json({ message: "Erreur serveur" });
+        }
+        return; // Fin explicite du bloc
       }
+
 
       default:
         res.setHeader("Allow", ["PUT", "DELETE"])
