@@ -6,7 +6,6 @@ import slugify from "slugify";
 import { isAdminFromSession } from "@/lib/auth/is-admin";
 import fs from "fs";
 import path from "path";
-import type { File } from "formidable";
 
 export const config = {
   api: {

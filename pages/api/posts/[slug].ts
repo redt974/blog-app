@@ -47,10 +47,14 @@ function parseForm(req: NextApiRequest): Promise<{ fields: formidable.Fields; fi
   })
 }
 
-function cleanupTmpDir() {
-  const tmpDir = path.join(process.cwd(), "tmp")
-  if (fs.existsSync(tmpDir)) {
-    fs.rmSync(tmpDir, { recursive: true, force: true })
+async function cleanupTmpDir() {
+  const tmpDir = path.join(process.cwd(), ".tmp")
+  try {
+    if (fs.existsSync(tmpDir)) {
+      await fs.promises.rm(tmpDir, { recursive: true, force: true })
+    }
+  } catch (err) {
+    console.error("Échec du nettoyage du dossier .tmp :", err)
   }
 }
 
@@ -68,11 +72,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: "Slug manquant" })
   }
 
+  const { fields, files } = await parseForm(req)
+
   try {
     switch (req.method) {
       case "PUT": {
-        const { fields, files } = await parseForm(req)
-
+        
         // S'assurer que ce sont des strings simples, pas des tableaux
         const titleRaw = fields.title
         const contentRaw = fields.content
@@ -86,13 +91,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const filesToDelete: string[] = filesToDeleteStr ? JSON.parse(filesToDeleteStr) : [];
 
         if (!title || !content || !category) {
-          cleanupTmpDir()
           return res.status(400).json({ message: "Champs requis manquants" })
         }
 
         const existingPost = await prisma.post.findUnique({ where: { slug } })
         if (!existingPost) {
-          cleanupTmpDir()
           return res.status(404).json({ message: "Post non trouvé" })
         }
 
@@ -101,7 +104,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           newSlug = slugify(title)
           const existingSlug = await prisma.post.findUnique({ where: { slug: newSlug } })
           if (existingSlug && existingSlug.id !== existingPost.id) {
-            cleanupTmpDir()
             return res.status(409).json({ message: "Ce titre génère un slug déjà existant" })
           }
         }
@@ -216,7 +218,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
         })
 
-        cleanupTmpDir()
         return res.status(200).json(updatedPost)
       }
       case "DELETE": {
@@ -235,7 +236,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   } catch (error) {
     console.error(error)
-    cleanupTmpDir()
     return res.status(500).json({ message: "Erreur serveur" })
+  } finally {
+    await cleanupTmpDir()
   }
 }
