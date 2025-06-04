@@ -24,7 +24,7 @@ function parseForm(req: NextApiRequest): Promise<{ fields: formidable.Fields; fi
   const form = new formidable.IncomingForm({
     allowEmptyFiles: true,
     minFileSize: 0,
-    uploadDir: tmpDir, // <-- système, auto-nettoyé
+    uploadDir: tmpDir,
     keepExtensions: true,
   })
 
@@ -55,21 +55,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const slug = req.query.slug as string
-
   if (!slug) {
     return res.status(400).json({ message: "Slug manquant" })
-  }
-
-  let fields: formidable.Fields = {};
-  let files: formidable.Files = {};
-
-  if (req.method === "PUT") {
-    ({ fields, files } = await parseForm(req));
   }
 
   try {
     switch (req.method) {
       case "PUT": {
+        const { fields, files } = await parseForm(req)
 
         // S'assurer que ce sont des strings simples, pas des tableaux
         const titleRaw = fields.title
@@ -92,13 +85,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(404).json({ message: "Post non trouvé" })
         }
 
-        let newSlug = slug
+        let newSlug = slug;
         if (title !== existingPost.title) {
-          newSlug = slugify(title)
-          const existingSlug = await prisma.post.findUnique({ where: { slug: newSlug } })
-          if (existingSlug && existingSlug.id !== existingPost.id) {
-            return res.status(409).json({ message: "Ce titre génère un slug déjà existant" })
+          const baseSlug = slugify(title);
+          let finalSlug = baseSlug;
+          let counter = 1;
+
+          while (true) {
+            const existingSlug = await prisma.post.findUnique({ where: { slug: finalSlug } });
+            if (!existingSlug || existingSlug.id === existingPost.id) {
+              break;
+            }
+            finalSlug = `${baseSlug}-${counter++}`;
           }
+          newSlug = finalSlug;
         }
 
         const slugChanged = newSlug !== slug
@@ -130,31 +130,44 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           if (url === existingPost.imageUrl) imageUrl = null;
         }
 
+        const allowedImageTypes = ["image/jpeg", "image/png", "image/webp"]
+        const allowedPdfTypes = ["application/pdf"]
+
         // --- 1) Traitement du fichier image ---
         if (files.image) {
           const imageFile = Array.isArray(files.image) ? files.image[0] : files.image
+          if (imageFile.size > 5 * 1024 * 1024) { // 5 MB
+            return res.status(400).json({ message: "Image trop volumineuse" })
+          }
           const hasValidImage = imageFile.size > 0 && imageFile.originalFilename
-          if (hasValidImage) {
+          if (hasValidImage && allowedImageTypes.includes(imageFile.mimetype || "")) {
             // Supprimer l’ancienne image si elle existe
             if (existingPost.imageUrl) {
               const oldImagePath = path.join(process.cwd(), "public", existingPost.imageUrl)
               if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath)
             }
             imageUrl = await saveFile(imageFile)
+          } else if (hasValidImage && !allowedImageTypes.includes(imageFile.mimetype || "")) {
+            return res.status(400).json({ message: "Seules les images JPEG, PNG et WebP sont autorisées" })
           }
         }
 
         // --- 2) Traitement du fichier PDF ---
         if (files.pdf) {
           const pdfFile = Array.isArray(files.pdf) ? files.pdf[0] : files.pdf
+          if (pdfFile.size > 20 * 1024 * 1024) { // 20 MB
+            return res.status(400).json({ message: "PDF trop volumineux" })
+          }
           const hasValidPDF = pdfFile.size > 0 && pdfFile.originalFilename
-          if (hasValidPDF) {
+          if (hasValidPDF && allowedPdfTypes.includes(pdfFile.mimetype || "")) {
             // Supprimer l’ancien PDF si existant
             if (existingPost.pdfUrl) {
               const oldPdfPath = path.join(process.cwd(), "public", existingPost.pdfUrl)
               if (fs.existsSync(oldPdfPath)) fs.unlinkSync(oldPdfPath)
             }
             pdfUrl = await saveFile(pdfFile)
+          } else if (hasValidPDF && !allowedPdfTypes.includes(pdfFile.mimetype || "")) {
+            return res.status(400).json({ message: "Seuls les fichiers PDF sont autorisés" })
           }
         }
 
@@ -236,8 +249,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
         return; // Fin explicite du bloc
       }
-
-
       default:
         res.setHeader("Allow", ["PUT", "DELETE"])
         return res.status(405).end(`Méthode ${req.method} non autorisée`)

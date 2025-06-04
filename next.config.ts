@@ -4,14 +4,14 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false, // Ne pas divulguer que tu utilises Next.js
   productionBrowserSourceMaps: false, // Désactiver les sourcemaps en production pour des raisons de sécurité
-  
+
   headers: async () => [
     {
       source: "/(.*)", // Toutes les routes
       headers: [
         {
           key: "Content-Security-Policy",
-          value: "default-src 'self'; img-src * data:; script-src 'self'; style-src 'self' 'unsafe-inline'",
+          value: "default-src 'self'; img-src * data:; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:;",
         },
         {
           key: "X-Content-Type-Options",

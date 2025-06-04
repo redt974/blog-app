@@ -93,7 +93,7 @@ export default function EditPost({ post }: Props) {
       const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
 
       if (!isValidFile(file, allowedExtensions, allowedMimeTypes)) {
-        alert("Image invalide : seuls les formats JPG, PNG ou WEBP sont autorisés.");
+        toast.error("Image invalide : seuls les formats JPG, PNG ou WEBP sont autorisés.");
         e.target.value = ""; // reset input
         return;
       }
@@ -113,7 +113,7 @@ export default function EditPost({ post }: Props) {
     if (file) {
       const isValid = file.type === "application/pdf" && file.name.endsWith(".pdf");
       if (!isValid) {
-        alert("Seuls les fichiers PDF sont autorisés.");
+        toast.error("Seuls les fichiers PDF sont autorisés.");
         e.target.value = "";
         return;
       }
@@ -135,7 +135,7 @@ export default function EditPost({ post }: Props) {
     e.preventDefault();
 
     if (!image && !imageUrl) {
-      alert("L'image principale est obligatoire.");
+      toast.error("L'image principale est obligatoire.");
       return;
     }
 
@@ -155,13 +155,13 @@ export default function EditPost({ post }: Props) {
         body: formData,
       });
 
-      if (!res.ok) throw new Error("Erreur lors de la mise à jour");
+      if (!res.ok) toast.error("Erreur lors de la mise à jour");
 
       const data = await res.json();
       const newSlug = data.slug || post.slug;
       router.push(`/posts/${newSlug}`);
-    } catch (err) {
-      console.error("Erreur de mise à jour :", err);
+    } catch (error) {
+      toast.error("Erreur durant la mise à jour : " + (error instanceof Error ? error.message : String(error)));
     } finally {
       setIsSubmitting(false);
     }
@@ -180,7 +180,6 @@ export default function EditPost({ post }: Props) {
       });
       setTimeout(() => router.push("/"), 2000);
     } catch (error) {
-      console.error("Error deleting post:", error);
       toast.update(toastId, {
         render: "Erreur lors de la suppression",
         type: "error",
@@ -302,7 +301,7 @@ export default function EditPost({ post }: Props) {
                   </motion.div>
                 </div>
 
-                {imagePreview && !filesToDelete.includes("image") && (
+                {(imagePreview && !filesToDelete.includes("image")) ? (
                   <div className="mb-4 relative group">
                     <label className="block text-sm font-medium text-black/80 mb-2">
                       Image actuelle :
@@ -329,9 +328,25 @@ export default function EditPost({ post }: Props) {
                       Supprimer l'image
                     </button>
                   </div>
-                )}
+                ) : (<div className="space-y-4">
+                  <div className="relative">
+                    <input
+                      type="file"
+                      name="image"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="block w-full text-sm text-black/70
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-yellow-50 file:text-black/70
+                        hover:file:bg-yellow-100
+                        file:cursor-pointer file:transition-colors"
+                    />
+                  </div>
+                </div>)}
 
-                {pdfUrl && !filesToDelete.includes("pdf") && (
+                {(pdfUrl && !filesToDelete.includes("pdf")) ? (
                   <div className="mb-4 p-4 bg-yellow-50 rounded-lg">
                     <label className="block text-sm font-medium text-black/80 mb-2">
                       PDF existant :
@@ -355,24 +370,7 @@ export default function EditPost({ post }: Props) {
                       Supprimer le PDF
                     </button>
                   </div>
-                )}
-
-                <div className="space-y-4">
-                  <div className="relative">
-                    <input
-                      type="file"
-                      name="image"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="block w-full text-sm text-black/70
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-full file:border-0
-                        file:text-sm file:font-semibold
-                        file:bg-yellow-50 file:text-black/70
-                        hover:file:bg-yellow-100
-                        file:cursor-pointer file:transition-colors"
-                    />
-                  </div>
+                ) : (<div className="space-y-4">
                   <div className="relative">
                     <input
                       type="file"
@@ -388,9 +386,8 @@ export default function EditPost({ post }: Props) {
                         file:cursor-pointer file:transition-colors"
                     />
                   </div>
-                </div>
+                </div>)}
               </div>
-
               <div className="flex flex-col sm:flex-row gap-4 pt-6">
                 <motion.button
                   whileHover={{ scale: 1.01 }}

@@ -1,12 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from "next"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "../auth/[...nextauth]"
+import { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "@/lib/prisma"
+import { getServerSession } from "next-auth"
+import { authOptions } from "../auth/[...nextauth]"
 import { isAdminFromSession } from "@/lib/auth/is-admin"
 import slugify from "slugify";
+import formidable from "formidable"
 import fs from "fs"
 import path from "path"
-import formidable from "formidable"
 import { v4 as uuidv4 } from "uuid"
 
 export const config = {
@@ -20,7 +20,7 @@ const tmpDir = path.join(process.cwd(), ".tmp")
 function parseForm(req: NextApiRequest): Promise<{ fields: formidable.Fields; files: formidable.Files }> {
   fs.mkdirSync(tmpDir, { recursive: true })
 
-  const formidable = require("formidable") // Import formidable dynamically to avoid issues with Next.js
+  const formidable = require("formidable")
   const form = new formidable.IncomingForm({
     allowEmptyFiles: true,
     minFileSize: 0,
@@ -108,7 +108,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const hasValidImage = imageFile.size > 0 && imageFile.originalFilename
       if (hasValidImage && allowedImageTypes.includes(imageFile.mimetype || "")) {
         imageUrl = await saveFile(imageFile)
-      } else {
+      } else if (hasValidImage && !allowedImageTypes.includes(imageFile.mimetype || "")){
         return res.status(400).json({ message: "Seules les images JPEG, PNG et WebP sont autorisées" })
       }
     }
@@ -121,7 +121,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const hasValidPDF = pdfFile.size > 0 && pdfFile.originalFilename
       if (hasValidPDF && allowedPdfTypes.includes(pdfFile.mimetype || "")) {
         pdfUrl = await saveFile(pdfFile)
-      } else {
+      } else if (hasValidPDF && !allowedPdfTypes.includes(pdfFile.mimetype || "")) {
         return res.status(400).json({ message: "Seuls les fichiers PDF sont autorisés" })
       }
     }

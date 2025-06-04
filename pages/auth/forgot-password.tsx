@@ -6,8 +6,6 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("");
-    toast.error("");
 
     try {
       const res = await fetch("/api/auth/forgot-password", {
