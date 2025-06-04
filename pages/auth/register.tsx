@@ -2,41 +2,47 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Mail, Lock, User, Github } from 'lucide-react';
 import { signIn } from "next-auth/react"
+import { toast } from 'react-toastify'
 
 export default function RegisterPage() {
-  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
-    setError(null)
+    toast.error(null)
 
     const form = e.currentTarget
+
     const formData = {
       name: form.name.valueOf,
       email: form.email.value,
       password: form.password.value,
     }
 
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
 
-    const data = await res.json()
+      const data = await res.json()
 
-    if (!res.ok) {
-      setError(data.message || "Erreur inconnue.")
+      if (!res.ok) {
+        // Affichage de l'erreur côté frontend
+        toast.error(data.message || "Erreur inconnue.")
+        setLoading(false)
+        return
+      }
+
+      // Optionnel : tu peux ici gérer un message de succès ou directement rediriger
+      router.push("/auth/login?verify=email")
+    } catch (err) {
+      toast.error("Une erreur est survenue, veuillez réessayer plus tard.")
       setLoading(false)
-      return
     }
-
-    router.push("/auth/login?verify=email")
   }
 
   return (
@@ -45,68 +51,62 @@ export default function RegisterPage() {
         <div className="p-8">
           <h1 className="text-2xl font-semibold text-center text-gray-800 mb-2">Créer un compte</h1>
           <p className="text-center text-gray-600 mb-6">Inscrivez-vous pour accéder à votre espace</p>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1">
               <div className="relative">
                 <span className="absolute inset-y-0 left-3 flex items-center text-gray-500">
                   <User size={18} />
                 </span>
-                <input 
-                  type="text" 
-                  name="name" 
-                  placeholder="Nom" 
-                  required 
-                  className="w-full py-3 px-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Nom"
+                  required
+                  className="w-full py-3 px-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
             </div>
-            
+
             <div className="space-y-1">
               <div className="relative">
                 <span className="absolute inset-y-0 left-3 flex items-center text-gray-500">
                   <Mail size={18} />
                 </span>
-                <input 
-                  type="email" 
-                  name="email" 
-                  placeholder="Email" 
-                  required 
-                  className="w-full py-3 px-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  required
+                  className="w-full py-3 px-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
             </div>
-            
+
             <div className="space-y-1">
               <div className="relative">
                 <span className="absolute inset-y-0 left-3 flex items-center text-gray-500">
                   <Lock size={18} />
                 </span>
-                <input 
-                  type="password" 
-                  name="password" 
-                  placeholder="Mot de passe" 
-                  required 
-                  className="w-full py-3 px-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Mot de passe"
+                  required
+                  className="w-full py-3 px-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
             </div>
-            
-            <button 
-              type="submit" 
-              disabled={loading} 
+
+            <button
+              type="submit"
+              disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? "Création..." : "Créer le compte"}
             </button>
           </form>
-          
-          {error && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
-              {error}
-            </div>
-          )}
-          
+
           <div className="relative flex items-center justify-center mt-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
@@ -115,11 +115,11 @@ export default function RegisterPage() {
               ou continuer avec
             </div>
           </div>
-          
+
           <div className="mt-6 grid grid-cols-2 gap-3">
-            <button 
+            <button
               type="button"
-               onClick={() => signIn("google", { callbackUrl: "/" })}
+              onClick={() => signIn("google", { callbackUrl: "/" })}
               className="w-full flex justify-center items-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
               <svg width="20" height="20" viewBox="0 0 48 48">
@@ -130,7 +130,7 @@ export default function RegisterPage() {
               </svg>
               Google
             </button>
-            <button 
+            <button
               type="button"
               onClick={() => signIn("github", { callbackUrl: "/" })}
               className="w-full flex justify-center items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-medium py-2.5 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
@@ -139,9 +139,9 @@ export default function RegisterPage() {
               GitHub
             </button>
           </div>
-          
+
           <p className="mt-8 text-center text-gray-600 text-sm">
-            Déjà inscrit ? <a onClick={() => signIn()}  className="text-blue-600 hover:text-blue-800 font-medium">Se connecter</a>
+            Déjà inscrit ? <a onClick={() => signIn()} className="text-blue-600 hover:text-blue-800 font-medium">Se connecter</a>
           </p>
         </div>
       </div>

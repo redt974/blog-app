@@ -77,18 +77,50 @@ export default function EditPost({ post }: Props) {
   const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setImage(file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
+  const isValidFile = (file: File, allowedExtensions: string[], allowedMimeTypes: string[]) => {
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    const isExtensionValid = allowedExtensions.includes(fileExtension || "");
+    const isMimeValid = allowedMimeTypes.includes(file.type);
 
+    return isExtensionValid && isMimeValid;
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
+      const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
+
+      if (!isValidFile(file, allowedExtensions, allowedMimeTypes)) {
+        alert("Image invalide : seuls les formats JPG, PNG ou WEBP sont autorisés.");
+        e.target.value = ""; // reset input
+        return;
+      }
+
+      setImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      const isValid = file.type === "application/pdf" && file.name.endsWith(".pdf");
+      if (!isValid) {
+        alert("Seuls les fichiers PDF sont autorisés.");
+        e.target.value = "";
+        return;
+      }
+
+      setPdf(file);
+    }
+  };
 
   useEffect(() => {
     if (isAdmin === false) {
@@ -158,23 +190,6 @@ export default function EditPost({ post }: Props) {
       setIsSubmitting(false);
     }
   };
-
-  if (status === "loading") {
-    return (
-      <Layout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-pulse flex flex-col items-center space-y-4">
-            <div className="w-12 h-12 bg-blue-500/20"></div>
-            <div className="text-lg font-medium text-muted-foreground">
-              Chargement...
-            </div>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
-
-  if (status === "unauthenticated") router.push("/api/auth/signin");
 
   return (
     <Layout>
@@ -287,37 +302,36 @@ export default function EditPost({ post }: Props) {
                   </motion.div>
                 </div>
 
-                 {imagePreview && (
-                    <div className="mb-4 relative group">
-                      <label className="block text-sm font-medium text-black/80 mb-2">
-                        Image actuelle :
-                      </label>
-                      <div className="relative">
-                        <img
-                          src={imagePreview}
-                          alt="Image principale"
-                          className="w-full max-h-[200px] object-contain rounded-lg border border-yellow-200"
-                        />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                          <ImageIcon className="w-8 h-8 text-white" />
-                        </div>
+                {imagePreview && !filesToDelete.includes("image") && (
+                  <div className="mb-4 relative group">
+                    <label className="block text-sm font-medium text-black/80 mb-2">
+                      Image actuelle :
+                    </label>
+                    <div className="relative">
+                      <img
+                        src={imagePreview}
+                        alt="Image principale"
+                        className="w-full max-h-[200px] object-contain rounded-lg border border-yellow-200"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                        <ImageIcon className="w-8 h-8 text-white" />
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (post.imageUrl) {
-                            setFilesToDelete([...filesToDelete, post.imageUrl]);
-                          }
-                          setImagePreview(null);
-                        }}
-                        className="mt-2 text-sm px-3 py-1 bg-yellow-100 hover:bg-yellow-200 text-black/70 rounded transition-colors"
-                      >
-                        Supprimer l'image
-                      </button>
                     </div>
-                  )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFilesToDelete((prev) => [...prev, "image"]);
+                        setImagePreview(null);
+                        setImageUrl(null);
+                      }}
+                      className="mt-2 text-sm px-3 py-1 bg-yellow-100 hover:bg-yellow-200 text-black/70 rounded transition-colors"
+                    >
+                      Supprimer l'image
+                    </button>
+                  </div>
+                )}
 
-                {pdfUrl && !pdf && (
+                {pdfUrl && !filesToDelete.includes("pdf") && (
                   <div className="mb-4 p-4 bg-yellow-50 rounded-lg">
                     <label className="block text-sm font-medium text-black/80 mb-2">
                       PDF existant :
@@ -333,7 +347,7 @@ export default function EditPost({ post }: Props) {
                     <button
                       type="button"
                       onClick={() => {
-                        setFilesToDelete([...filesToDelete, pdfUrl]);
+                        setFilesToDelete((prev) => [...prev, "pdf"]);
                         setPdfUrl(null);
                       }}
                       className="text-sm px-3 py-1 bg-yellow-100 hover:bg-yellow-200 text-black/70 rounded transition-colors"
@@ -364,7 +378,7 @@ export default function EditPost({ post }: Props) {
                       type="file"
                       name="pdf"
                       accept="application/pdf"
-                      onChange={(e) => setPdf(e.target.files?.[0] || null)}
+                      onChange={handlePdfChange}
                       className="block w-full text-sm text-black/70
                         file:mr-4 file:py-2 file:px-4
                         file:rounded-full file:border-0

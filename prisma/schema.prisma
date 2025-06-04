@@ -26,7 +26,6 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
-  isAdmin       Boolean   @default(false) 
   phone         String?   // pour le téléphone
   newsletterSubscribed Boolean @default(false)
 

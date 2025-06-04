@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]"
 import { isAdminFromSession } from "@/lib/auth/is-admin"
+import slugify from "slugify";
 import formidable from "formidable"
 import fs from "fs"
 import path from "path"
@@ -12,19 +13,6 @@ export const config = {
   api: {
     bodyParser: false,
   },
-}
-
-function slugify(text: string) {
-  return text
-    .toString()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/[^\w\-]+/g, "")
-    .replace(/\-\-+/g, "-")
-    .replace(/^-+/, "")
-    .replace(/-+$/, "")
 }
 
 const tmpDir = path.join(process.cwd(), ".tmp")
@@ -234,13 +222,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         try {
           const uploadDir = path.join(process.cwd(), "public", "uploads", slug);
-          console.log("Tentative suppression du dossier :", uploadDir);
 
           if (fs.existsSync(uploadDir)) {
             await fs.promises.rm(uploadDir, { recursive: true, force: true });
-            console.log("Dossier supprimé :", uploadDir);
-          } else {
-            console.log("Dossier introuvable :", uploadDir);
           }
 
           await prisma.post.delete({ where: { slug } });

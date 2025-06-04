@@ -1,18 +1,31 @@
 import { useState } from "react";
+import { toast } from 'react-toastify'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch("/api/auth/forgot-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-    const data = await res.json();
-    setMessage(data.message);
+    toast.success("");
+    toast.error("");
+
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || "Une erreur est survenue.");
+      } else {
+        toast.success(data.message || "Lien envoyé avec succès.");
+      }
+    } catch (err) {
+      toast.error("Erreur réseau. Veuillez réessayer.");
+    }
   };
 
   return (
@@ -55,12 +68,6 @@ export default function ForgotPasswordPage() {
           >
             Envoyer le lien de réinitialisation
           </button>
-
-          {message && (
-            <div className="mt-4 p-3 bg-blue-50 rounded-xl border border-blue-100 text-blue-800 text-sm animate-fade-in">
-              <p className="text-center">{message}</p>
-            </div>
-          )}
 
           <div className="pt-2">
             <a

@@ -3,7 +3,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { GithubIcon, Mail, Lock } from "lucide-react";
-
+import { toast } from 'react-toastify'
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -32,6 +32,8 @@ export default function LoginPage() {
   const errorMessage = error
     ? errorMessages[error] || errorMessages.default
     : "";
+
+  if (error) toast.error(errorMessage);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-muted/50 to-background px-4">

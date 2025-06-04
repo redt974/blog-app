@@ -4,6 +4,7 @@ import Layout from "@/components/Layout"
 import useIsAdmin from "@/lib/hooks/use-is-admin"
 import Loader from "@/components/Loader";
 import { motion } from "framer-motion"
+import { toast } from 'react-toastify'
 import { PlusCircle, Image as ImageIcon } from "lucide-react"
 
 export default function NewPost() {
@@ -18,17 +19,50 @@ export default function NewPost() {
   const [pdf, setPdf] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const isValidFile = (file: File, allowedExtensions: string[], allowedMimeTypes: string[]) => {
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    const isExtensionValid = allowedExtensions.includes(fileExtension || "");
+    const isMimeValid = allowedMimeTypes.includes(file.type);
+
+    return isExtensionValid && isMimeValid;
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
+
     if (file) {
-      setImage(file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
+      const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
+      const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
+
+      if (!isValidFile(file, allowedExtensions, allowedMimeTypes)) {
+        toast.error("Image invalide : seuls les formats JPG, PNG ou WEBP sont autorisés.");
+        e.target.value = ""; // reset input
+        return;
       }
-      reader.readAsDataURL(file)
+
+      setImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
+
+  const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      const isValid = file.type === "application/pdf" && file.name.endsWith(".pdf");
+      if (!isValid) {
+        toast.error("Seuls les fichiers PDF sont autorisés.");
+        e.target.value = "";
+        return;
+      }
+
+      setPdf(file);
+    }
+  };
 
   useEffect(() => {
     if (isAdmin === false) {
@@ -43,13 +77,17 @@ export default function NewPost() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Reset messages à chaque soumission
+    toast.error(null);
+    toast.success(null);
+
     const formData = new FormData(e.currentTarget);
 
     formData.append("title", title);
     formData.append("content", content);
     formData.append("category", category);
-    formData.append("image", image);
-    formData.append("pdf", pdf);
+    if (image) formData.append("image", image);
+    if (pdf) formData.append("pdf", pdf);
 
     try {
       const res = await fetch("/api/posts", {
@@ -57,33 +95,28 @@ export default function NewPost() {
         body: formData,
       });
 
-      if (!res.ok) throw new Error("Erreur lors de la création du post");
+      const data = await res.json();
 
-      router.push("/");
+      if (!res.ok) {
+        // Si backend envoie message d’erreur
+        toast.error(data.message || "Erreur lors de la création du post");
+        return;
+      }
+
+      toast.success(data.message || "Annonce créée avec succès !");
+      // Optionnel : rediriger après un délai ou directement
+      setTimeout(() => router.push("/"), 1500);
+
     } catch (error) {
       console.error("Erreur lors de l'envoi :", error);
+      toast.error("Erreur réseau, veuillez réessayer.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (status === "loading") {
-    return (
-      <Layout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-pulse flex flex-col items-center space-y-4">
-            <div className="w-12 h-12 bg-blue-500/20"></div>
-            <div className="text-lg font-medium text-blue-600/60">Chargement...</div>
-          </div>
-        </div>
-      </Layout>
-    )
-  }
-
-  if (status === "unauthenticated") router.push("/api/auth/signin")
-
   return (
-     <Layout>
+    <Layout>
       <div className="min-h-screen py-12 px-4 sm:px-6 flex items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-400/20 via-background to-background/90">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -214,6 +247,7 @@ export default function NewPost() {
                       type="file"
                       name="pdf"
                       accept="application/pdf"
+                      onChange={handlePdfChange}
                       className="block w-full text-sm text-black/70
                         file:mr-4 file:py-2 file:px-4
                         file:rounded-full file:border-0
@@ -226,7 +260,7 @@ export default function NewPost() {
                 </div>
               </div>
 
-               <motion.button
+              <motion.button
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"

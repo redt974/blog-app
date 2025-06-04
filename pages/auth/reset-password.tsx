@@ -1,29 +1,53 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/router"
+import { toast } from 'react-toastify'
 
 export default function ResetPasswordPage() {
   const router = useRouter()
   const { token, email } = router.query
 
   const [password, setPassword] = useState("")
-  const [message, setMessage] = useState("")
   const [isValid, setIsValid] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (typeof token === "string" && typeof email === "string") {
       setIsValid(true)
+    } else {
+      setIsValid(false)
     }
   }, [token, email])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const res = await fetch("/api/auth/reset-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, email, password }),
-    })
-    const data = await res.json()
-    setMessage(data.message)
+    setLoading(true)
+    toast.error(null)
+    toast.success(null)
+
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, email, password }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        toast.error(data.message || "Une erreur est survenue lors de la réinitialisation.")
+        setLoading(false)
+        return
+      }
+
+      toast.success(data.message || "Mot de passe réinitialisé avec succès.")
+      setLoading(false)
+
+      // Rediriger après un délai
+      setTimeout(() => router.push("/auth/login"), 3000)
+    } catch (err) {
+      toast.error("Erreur réseau, veuillez réessayer.")
+      setLoading(false)
+    }
   }
 
   if (!isValid) {
@@ -77,14 +101,8 @@ export default function ResetPasswordPage() {
             type="submit"
             className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 focus:outline-none transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 active:translate-y-0"
           >
-            Réinitialiser le mot de passe
+            {loading ? "Réinitialisation..." : "Réinitialiser le mot de passe"}
           </button>
-
-          {message && (
-            <div className="mt-4 p-3 bg-blue-50 rounded-xl border border-blue-100 text-blue-800 text-sm animate-fade-in">
-              <p className="text-center">{message}</p>
-            </div>
-          )}
 
           <div className="pt-2">
             <a 

@@ -125,6 +125,12 @@ ou en ligne de commande :
 openssl rand -base64 32
 ```
 
+OU
+
+```bash
+node -e "console.log(require('crypto').randomBytes(256).toString('hex'))"
+```
+
 ---
 
 ## 🧪 Lancer l'application
