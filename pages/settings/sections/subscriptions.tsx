@@ -41,13 +41,13 @@ export default function Subscriptions() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="text-3xl font-bold text-yellow-800 mb-8">Abonnement à la newsletter</h1>
+      <h1 className="text-3xl font-bold text-black-800 mb-8">Abonnement à la newsletter</h1>
       
-      <div className="bg-yellow-50 rounded-xl p-6 border border-yellow-200">
+      <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex-1">
-            <h2 className="text-lg font-medium text-yellow-900">Recevoir les actualités et communications</h2>
-            <p className="text-yellow-700 mt-1">Restez informé des dernières nouvelles et mises à jour</p>
+            <h2 className="text-lg font-medium text-blue-900">Recevoir les actualités et communications</h2>
+            <p className="text-blue-700 mt-1">Restez informé des dernières nouvelles et mises à jour</p>
           </div>
           <div className="flex justify-start sm:justify-end">
             <Switch
@@ -55,8 +55,8 @@ export default function Subscriptions() {
               onChange={handleToggle}
               disabled={loading}
               className={classNames(
-                enabled ? 'bg-yellow-500' : 'bg-yellow-200',
-                'relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2'
+                enabled ? 'bg-blue-500' : 'bg-blue-200',
+                'relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
               )}
             >
               <span

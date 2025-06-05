@@ -37,7 +37,7 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-yellow-50">
       {/* Tel Header */}
-      <div className="sticky top-0 z-50 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 relative p-4 flex justify-between items-center">
+      <div className="sticky top-0 z-50 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 relative p-4 flex justify-between items-center">
         <Link
           href="/"
           className="flex items-center space-x-2 text-white transform hover:scale-105 transition-transform duration-200"
@@ -48,11 +48,11 @@ export default function SettingsPage() {
             alt="Logo CSP"
             className="w-10 h-10 object-contain"
           />
-          <span className="font-bold text-lg tracking-tight text-black">Club Sportif de Pierrelaye</span>
+          <span className="font-bold text-lg tracking-tight text-white">Club Sportif de Pierrelaye</span>
         </Link>
         <button
           onClick={toggleMenu}
-          className="p-2 hover:bg-yellow-600 rounded-lg transition-colors md:hidden"
+          className="p-2 hover:bg-blue-700 rounded-lg transition-colors md:hidden"
         >
           {isMenuOpen ? <X size={24} className="text-black" /> : <Menu size={24} className="text-black" />}
         </button>
@@ -64,14 +64,14 @@ export default function SettingsPage() {
           className={`
             ${isMenuOpen ? 'block' : 'hidden'}
             md:block
-            w-full md:w-72 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600
+            w-full md:w-72 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700
             text-white p-6 md:min-h-screen
             transition-all duration-300 ease-in-out
           `}
         >
-          <div className="hidden md:block mb-8">
-            <h2 className="text-xl font-semibold text-black mb-2">Paramètres</h2>
-            <div className="h-1 w-12 bg-yellow-200 rounded"></div>
+           <div className="hidden md:block mb-8">
+            <h2 className="text-xl font-semibold text-white mb-2">Paramètres</h2>
+            <div className="h-1 w-12 bg-blue-300 rounded"></div>
           </div>
           <nav className="space-y-1">
             {sections.map(s => (
@@ -81,8 +81,8 @@ export default function SettingsPage() {
                 onClick={() => setIsMenuOpen(false)}
                 className={`block px-4 py-3 rounded-lg transition-all duration-200 ${
                   section === s.key 
-                    ? 'bg-yellow-300 text-black shadow-lg transform scale-105' 
-                    : 'text-black hover:bg-yellow-400/50 hover:text-black'
+                    ? 'bg-blue-200 text-blue-900 shadow-lg transform scale-105' 
+                    : 'text-white hover:bg-blue-400/50 hover:text-white'
                 }`}
               >
                 {s.label}

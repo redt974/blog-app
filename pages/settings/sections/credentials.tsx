@@ -51,7 +51,7 @@ export default function Credentials() {
               name="currentPassword"
               value={form.currentPassword}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-yellow-200 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors bg-yellow-50"
+              className="w-full px-4 py-3 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-blue-50"
               required
             />
           </div>
@@ -64,7 +64,7 @@ export default function Credentials() {
               name="newPassword"
               value={form.newPassword}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-yellow-200 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors bg-yellow-50"
+              className="w-full px-4 py-3 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-blue-50"
               required
             />
           </div>
@@ -77,7 +77,7 @@ export default function Credentials() {
               name="confirmPassword"
               value={form.confirmPassword}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-yellow-200 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors bg-yellow-50"
+              className="w-full px-4 py-3 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-blue-50"
               required
             />
           </div>
@@ -87,8 +87,8 @@ export default function Credentials() {
           disabled={loading}
           className={`w-full px-6 py-3 text-black-900 font-medium rounded-lg transition-all duration-200 ${
             loading
-              ? 'bg-yellow-200 cursor-not-allowed'
-              : 'bg-yellow-400 hover:bg-yellow-500 active:transform active:scale-95'
+              ? 'bg-blue-200 cursor-not-allowed'
+              : 'bg-blue-400 hover:bg-blue-500 active:transform active:scale-95'
           }`}
         >
           {loading ? 'Enregistrement…' : 'Sauvegarder'}
