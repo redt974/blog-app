@@ -1,12 +1,10 @@
+"use client"
+
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useSession } from 'next-auth/react'
-import { Switch } from '@headlessui/react'
 import { toast } from 'react-toastify'
-
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
-}
+import { Bell, Mail, Settings } from 'lucide-react'
 
 export default function Subscriptions() {
   const { data: session } = useSession()
@@ -40,32 +38,56 @@ export default function Subscriptions() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <h1 className="text-3xl font-bold text-black-800 mb-8">Abonnement à la newsletter</h1>
-      
-      <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex-1">
-            <h2 className="text-lg font-medium text-blue-900">Recevoir les actualités et communications</h2>
-            <p className="text-blue-700 mt-1">Restez informé des dernières nouvelles et mises à jour</p>
+    <div className="max-w-2xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Communications de l'Association</h1>
+        <p className="text-gray-600">Gérez vos préférences de communication et notifications</p>
+      </div>
+
+      <div className="space-y-6">
+        {/* Newsletter */}
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start space-x-4">
+              <div className="bg-blue-100 p-3 rounded-lg">
+                <Mail className="text-blue-600" size={24} />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Newsletter du club</h3>
+                <p className="text-gray-600 mb-4">
+                  Recevez les dernières actualités, événements et informations importantes du Club Sportif de Pierrelaye.
+                </p>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Bell size={16} />
+                  <span>Fréquence : Hebdomadaire</span>
+                </div>
+              </div>
+            </div>
+            <div className="ml-4">
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={enabled}
+                  onChange={(e) => handleToggle(e.target.checked)}
+                  disabled={loading}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
           </div>
-          <div className="flex justify-start sm:justify-end">
-            <Switch
-              checked={enabled}
-              onChange={handleToggle}
-              disabled={loading}
-              className={classNames(
-                enabled ? 'bg-blue-500' : 'bg-blue-200',
-                'relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
-              )}
-            >
-              <span
-                className={classNames(
-                  enabled ? 'translate-x-7' : 'translate-x-1',
-                  'inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out'
-                )}
-              />
-            </Switch>
+        </div>
+        
+        {/* Informations */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start">
+            <Settings className="text-blue-600 mt-1 mr-3" size={20} />
+            <div>
+              <h3 className="text-blue-900 font-medium mb-1">À propos de vos préférences</h3>
+              <p className="text-blue-700 text-sm">
+                Vous pouvez modifier ces paramètres à tout moment. Les notifications importantes restent toujours activées pour votre sécurité et celle des autres membres.
+              </p>
+            </div>
           </div>
         </div>
       </div>
