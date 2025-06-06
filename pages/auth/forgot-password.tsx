@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { toast } from 'react-toastify'
+import Captcha from "@/components/Captcha";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
+  const [captcha, setCaptcha] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -11,7 +13,7 @@ export default function ForgotPasswordPage() {
       const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, captcha }),
       });
 
       const data = await res.json();
@@ -60,8 +62,11 @@ export default function ForgotPasswordPage() {
             />
           </div>
 
+          <Captcha onVerify={setCaptcha} />
+
           <button
             type="submit"
+            disabled={!captcha}
             className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 focus:outline-none transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 active:translate-y-0"
           >
             Envoyer le lien de réinitialisation

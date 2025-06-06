@@ -2,14 +2,20 @@ import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { randomBytes } from "crypto"
 import { NextApiRequest, NextApiResponse } from "next"
+import { verifyCaptcha } from "@/lib/captcha";
 import { sendVerificationEmail } from "@/lib/mailer"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end()
 
-  const { name, email, password } = req.body
-  if (!email || !password) {
+  const { name, email, password, captcha } = req.body
+  if (!email || !password || !captcha) {
     return res.status(400).json({ message: "Email et mot de passe requis." })
+  }
+
+  const isHuman = await verifyCaptcha(captcha);
+  if (!isHuman.success || isHuman.score < 0.5) {
+    return res.status(400).json({ message: "Échec de la vérification captcha." });
   }
 
   const existing = await prisma.user.findUnique({ where: { email } })

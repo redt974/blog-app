@@ -2,7 +2,8 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]"
-import { isAdminFromSession } from "@/lib/auth/is-admin"
+import { isAdminFromSession } from "@/lib/auth/is-admin";
+import { redis } from "@/lib/redis";
 import slugify from "slugify";
 import formidable from "formidable"
 import fs from "fs"
@@ -53,10 +54,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const session = await getServerSession(req, res, authOptions)
+  const email = req?.body?.email || "unknown"; // ou extrait de session
   const isAdmin = await isAdminFromSession(req, res)
 
+  const failKey = `admin-api:fail:${email}`;
+  const blockKey = `admin-api:block:${email}`;
+
+  const isBlocked = await redis.exists(blockKey);
+  if (isBlocked) return res.status(403).end();
+
   if (!session || !isAdmin) {
-    return res.status(403).json({ error: "Forbidden" })
+    const attempts = await redis.incr(failKey);
+    if (attempts === 1) await redis.expire(failKey, 300);
+    if (attempts >= 5) await redis.set(blockKey, "1", "EX", 300);
+    return res.status(403).end();
   }
 
   try {

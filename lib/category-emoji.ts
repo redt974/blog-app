@@ -6,7 +6,7 @@ export function getCategoryEmoji(category: string): string {
       return "🏀";
     case "tennis":
       return "🎾";
-    case "bowling":
+    case "boule":
       return "🎳";
     case "vtt":
       return "🚵‍♂️";

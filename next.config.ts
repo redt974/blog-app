@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
       headers: [
         {
           key: "Content-Security-Policy",
-          value: "default-src 'self'; img-src * data:; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:;",
+          value: "img-src * data:; script-src 'self' https://www.google.com https://www.gstatic.com 'unsafe-inline'; frame-src https://www.google.com https://www.gstatic.com;"
         },
         {
           key: "X-Content-Type-Options",

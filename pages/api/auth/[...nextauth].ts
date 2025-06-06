@@ -4,7 +4,12 @@ import GitHubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
+import { redis } from "@/lib/redis"
 import bcrypt from "bcryptjs"
+import { verifyCaptcha } from "@/lib/captcha"
+
+const MAX_ATTEMPTS = 5;
+const BLOCK_DURATION = 60 * 5; // 5 minutes
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
@@ -22,24 +27,58 @@ export const authOptions = {
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
+        captcha: { label: "Captcha", type: "text" },
       },
-      async authorize(credentials) {
-        const user = await prisma.user.findUnique({
-          where: { email: credentials?.email },
-        })
+      async authorize(credentials, req) {
+        const email = credentials?.email?.toLowerCase();
+        const password = credentials?.password;
+        const captcha = credentials?.captcha;
 
-        if (user && user.password && credentials?.password) {
-          const isValid = await bcrypt.compare(credentials.password, user.password)
+        if (!email || !password || !captcha) throw new Error("Champs requis manquants");
 
-          if (isValid) {
-            if (!user.emailVerified) {
-              throw new Error("Email non vérifié")
-            }
-            return user
-          }
+        const isHuman = await verifyCaptcha(captcha);
+        if (!isHuman.success || isHuman.score < 0.5) {
+          throw new Error("Échec de la vérification captcha.");
         }
 
-        return null
+        const failKey = `login:fail:${email}`;
+        const blockKey = `login:block:${email}`;
+
+        const isBlocked = await redis.exists(blockKey);
+        if (isBlocked) {
+          throw new Error("Trop de tentatives. Réessaie dans 5 minutes.");
+        }
+
+        const user = await prisma.user.findUnique({
+          where: { email },
+        });
+
+        const isValid = user && user.password && await bcrypt.compare(password, user.password);
+
+        if (!isValid) {
+          const attempts = await redis.incr(failKey);
+
+          if (attempts === 1) {
+            await redis.expire(failKey, BLOCK_DURATION);
+          }
+
+          if (attempts >= MAX_ATTEMPTS) {
+            await redis.set(blockKey, "1", "EX", BLOCK_DURATION);
+            throw new Error("Compte temporairement bloqué suite à plusieurs tentatives.");
+          }
+
+          throw new Error("Identifiants incorrects");
+        }
+
+        if (!user.emailVerified) {
+          throw new Error("Email non vérifié");
+        }
+
+        // Succès : reset des compteurs
+        await redis.del(failKey);
+        await redis.del(blockKey);
+
+        return user;
       },
     }),
 

@@ -1,24 +1,69 @@
-import { prisma } from "@/lib/prisma"
-import { transporter } from "@/lib/mailer"
-import { randomBytes } from "crypto"
-import { NextApiRequest, NextApiResponse } from "next"
-import { passwordResetTemplate } from "@/templates/forgot-password"
+import { prisma } from "@/lib/prisma";
+import { transporter } from "@/lib/mailer";
+import { randomBytes } from "crypto";
+import { NextApiRequest, NextApiResponse } from "next";
+import { passwordResetTemplate } from "@/templates/forgot-password";
+import { verifyCaptcha } from "@/lib/captcha";
+import { redis } from "@/lib/redis";
+
+const MAX_ATTEMPTS = 3;
+const BLOCK_DURATION = 60 * 15; // 15 minutes
+const COOLDOWN_DURATION = 60 * 5; // 5 minutes entre deux emails
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    if (req.method !== "POST") return res.status(405).end();
 
-    if (req.method !== "POST") return res.status(405).end()
+    const { email, captcha } = req.body;
+    if (!email || !captcha) {
+        return res.status(400).json({ message: "Email et captcha requis." });
+    }
 
-    const { email } = req.body
-    if (!email) return res.status(400).json({ message: "Email requis." })
+    const isHuman = await verifyCaptcha(captcha);
+    if (!isHuman.success || isHuman.score < 0.5) {
+        return res.status(400).json({ message: "Échec de la vérification captcha." });
+    }
 
-    const user = await prisma.user.findUnique({ where: { email } })
-    if (!user) return res.status(200).json({ message: "Email envoyé si le compte existe." }) // Ne pas révéler si l'utilisateur existe
+    const blockKey = `reset:block:${email}`;
+    const cooldownKey = `reset:cooldown:${email}`;
+    const attemptsKey = `reset:attempts:${email}`;
 
-    const token = randomBytes(32).toString("hex")
-    const expires = new Date(Date.now() + 1000 * 60 * 60) // 1h
-    const url = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${token}&email=${email}`
+    const isBlocked = await redis.exists(blockKey);
+    if (isBlocked) {
+        return res.status(429).json({ message: "Trop de tentatives. Réessaie plus tard." });
+    }
 
-    const { html, subject } = passwordResetTemplate({ url, email })
+    const isOnCooldown = await redis.exists(cooldownKey);
+    if (isOnCooldown) {
+        return res.status(429).json({ message: "Tu dois attendre avant de redemander un email." });
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    // Toujours répondre pareil (éviter l’énumération)
+    const genericResponse = { message: "Email envoyé si le compte existe." };
+
+    if (!user) {
+        return res.status(200).json(genericResponse);
+    }
+
+    const attempts = await redis.incr(attemptsKey);
+    if (attempts === 1) {
+        await redis.expire(attemptsKey, BLOCK_DURATION);
+    }
+
+    if (attempts >= MAX_ATTEMPTS) {
+        await redis.set(blockKey, "1", "EX", BLOCK_DURATION);
+        return res.status(429).json({ message: "Trop de tentatives. Réessaie plus tard." });
+    }
+
+    // Appliquer cooldown avant d’envoyer un nouveau mail
+    await redis.set(cooldownKey, "1", "EX", COOLDOWN_DURATION);
+
+    const token = randomBytes(32).toString("hex");
+    const expires = new Date(Date.now() + 1000 * 60 * 60); // 1h
+    const url = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${token}&email=${email}`;
+
+    const { html, subject } = passwordResetTemplate({ url, email });
 
     await prisma.passwordResetToken.create({
         data: {
@@ -26,17 +71,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             email,
             expires,
         },
-    })
-
-
+    });
 
     await transporter.sendMail({
         from: `"MonApp" <${process.env.GMAIL_USER}>`,
         to: email,
         subject,
         html,
-    })
+    });
 
-
-    return res.status(200).json({ message: "Email envoyé si le compte existe." })
+    return res.status(200).json(genericResponse);
 }

@@ -6,9 +6,15 @@ export default function useIsAdmin() {
   useEffect(() => {
     fetch("/api/auth/admin-check")
       .then((res) => res.json())
-      .then((data) => setIsAdmin(data.isAdmin))
+      .then((data) => {
+        if (data.reason === "blocked") {
+          console.warn("Trop de tentatives admin, utilisateur bloqué.");
+        }
+        setIsAdmin(data.isAdmin);
+      })
       .catch(() => setIsAdmin(false));
   }, []);
 
   return isAdmin;
 }
+

@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import { Pencil, Trash2, Image as ImageIcon } from "lucide-react";
 import Loader from "@/components/Loader";
 import { toast } from "react-toastify";
+import AccessDenied from "@/pages/403";
 
 type Props = {
   post: {
@@ -61,6 +62,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 export default function EditPost({ post }: Props) {
   const isAdmin = useIsAdmin();
   const router = useRouter();
+  const [accessDenied, setAccessDenied] = useState(false);
+
+  useEffect(() => {
+    if (isAdmin === false) {
+      setAccessDenied(true); // Affiche la page 403 personnalisée
+
+      const timeout = setTimeout(() => {
+        router.replace("/");
+      }, 3000); // redirige après 3 secondes
+
+      return () => clearTimeout(timeout);
+    }
+  }, [isAdmin]);
+
+  if (isAdmin === null) return <Loader />;
+  if (accessDenied) return <AccessDenied/>;
 
   const [title, setTitle] = useState(post.title);
   const [content, setContent] = useState(post.content);
@@ -121,15 +138,6 @@ export default function EditPost({ post }: Props) {
       setPdf(file);
     }
   };
-
-  useEffect(() => {
-    if (isAdmin === false) {
-      router.push("/");
-    }
-  }, [isAdmin]);
-
-  if (isAdmin === null) return <Loader />;
-  if (isAdmin === false) return null;
 
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -4,18 +4,29 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { GithubIcon, Mail, Lock } from "lucide-react";
 import { toast } from 'react-toastify'
+import Captcha from "@/components/Captcha";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [captcha, setCaptcha] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await signIn("credentials", {
+
+    const response = await signIn("credentials", {
+      redirect: false,
       email,
       password,
-      callbackUrl: "/",
+      captcha,
     });
+
+    if (response?.error) {
+      toast.error(response.error);
+      return;
+    } else {
+      window.location.href = "/"; 
+    }
   };
 
   const searchParams = useSearchParams();
@@ -89,11 +100,14 @@ export default function LoginPage() {
             </div>
           </div>
 
+          <Captcha onVerify={setCaptcha}/>
+
           <motion.button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            disabled={!captcha}
           >
             Se connecter
           </motion.button>

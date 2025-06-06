@@ -3,9 +3,11 @@ import { useRouter } from "next/navigation"
 import { Mail, Lock, User, Github } from 'lucide-react';
 import { signIn } from "next-auth/react"
 import { toast } from 'react-toastify'
+import Captcha from "@/components/Captcha";
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
+  const [captcha, setCaptcha] = useState<string | null>(null);
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -19,6 +21,7 @@ export default function RegisterPage() {
       name: form.name.valueOf,
       email: form.email.value,
       password: form.password.value,
+      captcha: captcha,
     }
 
     try {
@@ -98,9 +101,11 @@ export default function RegisterPage() {
               </div>
             </div>
 
+            <Captcha onVerify={setCaptcha} />
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !captcha}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? "Création..." : "Créer le compte"}
