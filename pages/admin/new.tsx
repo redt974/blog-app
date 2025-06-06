@@ -6,10 +6,27 @@ import Loader from "@/components/Loader";
 import { motion } from "framer-motion"
 import { toast } from 'react-toastify'
 import { PlusCircle, Image as ImageIcon } from "lucide-react"
+import AccessDenied from "@/pages/403";
 
 export default function NewPost() {
   const isAdmin = useIsAdmin();
   const router = useRouter()
+  const [accessDenied, setAccessDenied] = useState(false);
+
+  useEffect(() => {
+    if (isAdmin === false) {
+      setAccessDenied(true); // Affiche la page 403 personnalisée
+
+      const timeout = setTimeout(() => {
+        router.replace("/");
+      }, 3000); // redirige après 3 secondes
+
+      return () => clearTimeout(timeout);
+    }
+  }, [isAdmin]);
+
+  if (isAdmin === null) return <Loader />;
+  if (accessDenied) return <AccessDenied />;
 
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
@@ -64,22 +81,9 @@ export default function NewPost() {
     }
   };
 
-  useEffect(() => {
-    if (isAdmin === false) {
-      router.push("/");
-    }
-  }, [isAdmin]);
-
-  if (isAdmin === null) return <Loader />;
-  if (isAdmin === false) return null;
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // Reset messages à chaque soumission
-    toast.error(null);
-    toast.success(null);
 
     const formData = new FormData(e.currentTarget);
 
