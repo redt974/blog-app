@@ -73,12 +73,12 @@ export default function PostPage({ post }: Props) {
       </Head>
 
       <Layout>
-        <div className="min-h-screen bg-gradient-to-b from-yellow-50/50 via-white to-white">
+        <div className="min-h-screen bg-gradient-to-b from-blue-50/50 via-white to-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="mb-8">
               <a
                 href="/"
-                className="inline-flex items-center gap-2 text-yellow-600 hover:text-yellow-700 transition-colors group"
+                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors group"
               >
                 <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
                 <span className="text-sm font-medium">Retour</span>
