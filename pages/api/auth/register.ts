@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs"
 import { randomBytes } from "crypto"
 import { NextApiRequest, NextApiResponse } from "next"
 import { verifyCaptcha } from "@/lib/captcha";
-import { sendVerificationEmail } from "@/lib/mailer"
+import { sendVerificationEmail } from "@/lib/resend"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end()

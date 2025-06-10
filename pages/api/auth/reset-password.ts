@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { hash } from "bcryptjs"
 import { NextApiRequest, NextApiResponse } from "next"
-import { transporter } from "@/lib/mailer"
+import { resend } from '@/lib/resend'
 import { passwordResetConfirmationTemplate } from "@/templates/reset-password"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -40,9 +40,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Envoyer un email de confirmation
   const { subject, html } = passwordResetConfirmationTemplate({ email })
-
-  await transporter.sendMail({
-    from: `"MonApp" <${process.env.GMAIL_USER}>`,
+  const from = `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_FROM_ADDRESS}>`
+  await resend.emails.send({
+    from,
     to: email,
     subject,
     html,

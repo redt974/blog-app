@@ -17,6 +17,7 @@ model Post {
   pdfUrl    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  newsletterSent  Boolean  @default(false) // 👈 Ajout
 }
 
 model User {
