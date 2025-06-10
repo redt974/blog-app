@@ -7,7 +7,7 @@ import SearchBar from "@/components/SearchBar";
 import Slider from "@/components/SportsSlider"
 import useIsAdmin from "@/lib/hooks/use-is-admin";
 import { getCategoryEmoji } from "@/lib/category-emoji";
-import { Bell, Search, Filter, ChevronDown, Edit, Trash2 } from 'lucide-react';
+import { Bell, Search, Filter, ChevronDown, Edit, Trash2, ChevronRight, ChevronUp } from 'lucide-react';
 
 type Post = {
   id: number;
@@ -44,6 +44,7 @@ export default function Home({ posts }: Props) {
   // États pour la recherche et le filtre catégorie
   const [searchResults, setSearchResults] = useState(posts);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [showAll, setShowAll] = useState(false);
 
   // Liste unique des catégories
   const categories = Array.from(new Set(posts.map((p) => p.category)));
@@ -51,6 +52,7 @@ export default function Home({ posts }: Props) {
   // Filtrer à la volée quand change la catégorie
   const handleCategoryChange = (cat: string) => {
     setSelectedCategory(cat);
+    setShowAll(false);
     // Si on a du texte dans la barre de recherche, on combine les filtres
     setSearchResults(
       posts.filter((p) => {
@@ -68,6 +70,7 @@ export default function Home({ posts }: Props) {
 
   const handleSearch = (results: Post[], query: string) => {
     setSearchQuery(query);
+    setShowAll(false);
     // Combine avec le filtre catégorie actuel
     setSearchResults(
       results.filter(
@@ -76,8 +79,12 @@ export default function Home({ posts }: Props) {
     );
   };
 
+  // Determine which posts to display
+  const displayedPosts = showAll ? searchResults : searchResults.slice(0, 6);
+  const hasMorePosts = searchResults.length > 6;
+
   return (
-    <Layout>
+     <Layout>
       <div className="min-h-screen bg-gray-50">
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900">
@@ -154,8 +161,8 @@ export default function Home({ posts }: Props) {
 
             {/* Results grid */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
-              {searchResults.length > 0 ? (
-                searchResults.map((post) => (
+              {displayedPosts.length > 0 ? (
+                displayedPosts.map((post) => (
                   <div
                     key={post.slug}
                     className="group bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
@@ -224,6 +231,23 @@ export default function Home({ posts }: Props) {
                 </div>
               )}
             </div>
+
+            {/* See More Button */}
+              {hasMorePosts && (
+              <div className="flex justify-center mb-12">
+                <button
+                  onClick={() => setShowAll(!showAll)}
+                  className="group inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
+                >
+                  <span>{showAll ? 'Voir moins' : 'Voir plus'}</span>
+                  {showAll ? (
+                    <ChevronUp className="h-4 w-4 group-hover:-translate-y-1 transition-transform duration-200" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </div>
         <Slider />

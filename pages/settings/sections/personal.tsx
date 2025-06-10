@@ -1,7 +1,10 @@
+"use client"
+
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { Camera, User, Mail, Phone } from 'lucide-react'
 
 type ProfileForm = {
   name: string
@@ -74,69 +77,102 @@ export default function PersonalSection() {
   const imageSrc = form.image || '/default-avatar.jpg'
 
   return (
-    <div className="flex flex-col items-center">
-      <h1 className="text-3xl font-bold text-black-800 mb-8 w-full text-center md:text-left">Informations Personnelles</h1>
+    <div className="max-w-2xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Informations Personnelles</h1>
+        <p className="text-gray-600">Gérez vos informations personnelles et votre photo de profil</p>
+      </div>
 
-      <div className="w-full max-w-md mx-auto">
-        <div className="mb-8">
-          <div className="relative w-32 h-32 mx-auto">
+      {/* Photo de profil */}
+      <div className="mb-8 flex justify-center">
+        <div className="relative">
+          <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 border-4 border-white shadow-lg">
             <img
               src={imageSrc}
               alt="Photo de profil"
-              className="w-32 h-32 rounded-full object-cover ring-4 ring-black-200 shadow-lg"
+              className="w-full h-full object-cover"
             />
-            <label
-              htmlFor="upload-image"
-              className="absolute inset-0 flex items-center justify-center bg-black-900/50 rounded-full opacity-0 hover:opacity-100 transition-opacity cursor-pointer group"
-            >
-              <span className="text-white text-sm font-medium px-3 py-2 bg-black-800/70 rounded-lg transform group-hover:scale-105 transition-transform">
-                Changer
-              </span>
+          </div>
+          <label
+            htmlFor="upload-image"
+            className="absolute bottom-2 right-2 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full cursor-pointer transition-colors shadow-lg"
+          >
+            <Camera size={16} />
+          </label>
+          <input
+            id="upload-image"
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="hidden"
+            disabled={uploading}
+          />
+        </div>
+      </div>
+
+      {/* Formulaire */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+              <User size={16} className="mr-2 text-gray-500" />
+              Nom complet
             </label>
             <input
-              id="upload-image"
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="hidden"
-              disabled={uploading}
+              name="name"
+              type="text"
+              value={form.name}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="Votre nom complet"
+            />
+          </div>
+
+          <div>
+            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+              <Mail size={16} className="mr-2 text-gray-500" />
+              Adresse email
+            </label>
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="votre@email.com"
             />
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {[
-            { name: 'name', label: 'Nom complet', type: 'text' },
-            { name: 'email', label: 'Adresse email', type: 'email' },
-            { name: 'phone', label: 'Téléphone', type: 'tel' }
-          ].map((field) => (
-            <div key={field.name}>
-              <label className="block text-sm font-medium text-black-800 mb-2">
-                {field.label}
-              </label>
-              <input
-                name={field.name}
-                type={field.type}
-                value={form[field.name]}
-                onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-blue-50"
-              />
-            </div>
-          ))}
+        <div>
+          <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+            <Phone size={16} className="mr-2 text-gray-500" />
+            Téléphone
+          </label>
+          <input
+            name="phone"
+            type="tel"
+            value={form.phone}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            placeholder="+33 1 23 45 67 89"
+          />
+        </div>
 
+        <div className="pt-6 border-t border-gray-200">
           <button
             type="submit"
             disabled={loading}
-            className={`w-full px-6 py-3 text-black-900 font-medium rounded-lg transition-all duration-200 ${
+            className={`w-full md:w-auto px-8 py-3 text-white font-medium rounded-lg transition-all duration-200 ${
               loading
-                ? 'bg-blue-200 cursor-not-allowed'
-                : 'bg-blue-400 hover:bg-blue-500 active:transform active:scale-95'
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 active:transform active:scale-95'
             }`}
           >
-            {loading ? 'Enregistrement…' : 'Sauvegarder'}
+            {loading ? 'Enregistrement…' : 'Sauvegarder les modifications'}
           </button>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   )
 }
