@@ -35,116 +35,20 @@ GOOGLE_CLIENT_SECRET=
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=
 
-# Envoi d’e-mails via Gmail
-GMAIL_HOST=smtp.gmail.com
-GMAIL_USER=
-GMAIL_PASSWORD=
-GMAIL_PORT=587
-GMAIL_USE_TLS=true
-```
+# Captcha
+NEXT_PUBLIC_CAPTCHA_SITE_KEY=
+CAPTCHA_SECRET_KEY=
 
----
+# Resend
+RESEND_API_KEY=
+EMAIL_FROM_NAME="MyApp"
+EMAIL_FROM_ADDRESS="onboarding@resend.dev"
 
-## 🔐 Configuration de l’authentification GitHub
+# Contact
+CONTACT_TO_EMAIL=
 
-1. Va sur [GitHub Developer Settings](https://github.com/settings/developers)
-
-2. Clique sur **OAuth Apps** → puis **New OAuth App**
-
-3. Remplis le formulaire :
-
-* **Application name** : `Site Club Pierrelaye`
-* **Homepage URL** : `http://localhost:3000`
-* **Authorization callback URL** :
-  `http://localhost:3000/api/auth/callback/github`
-
-4. Clique sur **Register application**
-
-5. Récupère :
-
-* `Client ID` → à mettre dans `.env` en tant que `GITHUB_ID`
-* `Client Secret` → clique sur "Generate a new client secret" → `GITHUB_SECRET`
-
----
-
-## 🔐 Configuration de l’authentification Google (OAuth)
-
-1. Va sur [Google Cloud Console](https://console.cloud.google.com/)
-
-2. Crée un projet, puis va dans **API & Services > Identifiants**
-
-3. Clique sur **Créer des identifiants > ID client OAuth**
-
-4. Choisis **Application Web**, et configure :
-
-* **Origine autorisée JavaScript** : `http://localhost:3000`
-* **URI de redirection autorisé** :
-  `http://localhost:3000/api/auth/callback/google`
-
-5. Récupère :
-
-* `Client ID` → `GOOGLE_CLIENT_ID`
-* `Client Secret` → `GOOGLE_CLIENT_SECRET`
-
----
-
-## 📧 Configuration de Gmail pour l’envoi d’e-mails
-
-### 1. Activer la validation en deux étapes (obligatoire)
-
-Avant de générer un mot de passe d’application, tu dois activer la validation en deux étapes sur ton compte Gmail :
-
-* Va sur : [https://myaccount.google.com/security](https://myaccount.google.com/security)
-* Dans la section **"Connexion à Google"**, clique sur **"Validation en deux étapes"**
-* Suis les étapes pour l’activer (téléphone + SMS ou app Google Authenticator)
-
-### 2. Générer un mot de passe d’application Gmail
-
-Une fois la 2FA activée :
-
-* Va sur : [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
-* Choisis **"Sélectionner une application" → Autre (personnalisée)** → mets par ex. "blog-app"
-* Clique sur **Générer**
-* Copie le mot de passe généré
-
-### 3. Remplir les variables dans `.env`
-
-```env
-GMAIL_USER=votreadresse@gmail.com
-GMAIL_PASSWORD=mot_de_passe_application
-```
-
----
-
-## 🔐 Générer le `NEXTAUTH_SECRET`
-
-Utilise un générateur de mot de passe sécurisé (ex : [Dashlane](https://www.dashlane.com/fr/features/password-generator))
-ou en ligne de commande :
-
-```bash
-openssl rand -base64 32
-```
-
-OU
-
-```bash
-node -e "console.log(require('crypto').randomBytes(256).toString('hex'))"
-```
-
----
-
-## 🧪 Lancer l'application
-
-* Démarrer le serveur Next.js :
-
-```bash
-npm run dev
-```
-
-* Ouvrir Prisma Studio pour explorer la BDD :
-
-```bash
-npx prisma studio
+# Redis
+REDIS_URL=redis://localhost:6379
 ```
 
 ---
@@ -223,10 +127,130 @@ ADMIN_EMAIL_HASH = "2e40174d68d208e69c3f7076502a3e88ae6c0c1b8a10ff237f4152e9d153
 
 ---
 
+## 🔐 Configuration de l’authentification GitHub
+
+1. Va sur [GitHub Developer Settings](https://github.com/settings/developers)
+
+2. Clique sur **OAuth Apps** → puis **New OAuth App**
+
+3. Remplis le formulaire :
+
+* **Application name** : `Site Club Pierrelaye`
+* **Homepage URL** : `http://localhost:3000`
+* **Authorization callback URL** :
+  `http://localhost:3000/api/auth/callback/github`
+
+4. Clique sur **Register application**
+
+5. Récupère :
+
+* `Client ID` → à mettre dans `.env` en tant que `GITHUB_ID`
+* `Client Secret` → clique sur "Generate a new client secret" → `GITHUB_SECRET`
+
+---
+
+## 🔐 Configuration de l’authentification Google (OAuth)
+
+1. Va sur [Google Cloud Console](https://console.cloud.google.com/)
+
+2. Crée un projet, puis va dans **API & Services > Identifiants**
+
+3. Clique sur **Créer des identifiants > ID client OAuth**
+
+4. Choisis **Application Web**, et configure :
+
+* **Origine autorisée JavaScript** : `http://localhost:3000`
+* **URI de redirection autorisé** :
+  `http://localhost:3000/api/auth/callback/google`
+
+5. Récupère :
+
+* `Client ID` → `GOOGLE_CLIENT_ID`
+* `Client Secret` → `GOOGLE_CLIENT_SECRET`
+
+---
+
+## 🔐 Générer le `NEXTAUTH_SECRET`
+
+Utilise un générateur de mot de passe sécurisé (ex : [Dashlane](https://www.dashlane.com/fr/features/password-generator))
+ou en ligne de commande :
+
+```bash
+openssl rand -base64 32
+```
+
+OU
+
+```bash
+node -e "console.log(require('crypto').randomBytes(256).toString('hex'))"
+```
+
+---
+
+## 🧠 Configuration de reCAPTCHA
+
+Va sur https://www.google.com/recaptcha/admin/create
+
+Crée un site avec les bons paramètres (v2)
+
+Récupère :
+
+```env
+NEXT_PUBLIC_CAPTCHA_SITE_KEY=clé_site
+CAPTCHA_SECRET_KEY=clé_secrète
+```
+
+---
+
+## 📧 Configuration de Resend pour l’envoi d’e-mails
+
+1. Va sur https://resend.com et crée un compte
+
+2. Crée une API Key depuis ton tableau de bord Resend
+
+3. Renseigne-la dans ton fichier .env et modifier les informations d'expédition :
+
+```env
+RESEND_API_KEY=ta_clé_api_resend
+EMAIL_FROM_NAME="MyApp"
+EMAIL_FROM_ADDRESS="onboarding@resend.dev"
+```
+⚠️ Assure-toi d’avoir configuré un domaine et qu’il est validé pour l’envoi d’e-mails via Resend.
+
+---
+
+## 📨 Configuration du formulaire de contact
+
+* Renseigne l’email de destination :
+
+```env
+CONTACT_TO_EMAIL=ton.email@exemple.com
+```
+Ce champ est utilisé pour envoyer les messages du formulaire de contact.
+
+---
+
+## 🧪 Lancer l'application
+
+* Démarrer le serveur Next.js :
+
+```bash
+npm run dev
+```
+
+* Ouvrir Prisma Studio pour explorer la BDD :
+
+```bash
+npx prisma studio
+```
+
 ## ✅ Fonctionnalités intégrées
 
-* Authentification en admin
+* Authentification admin
 * Authentification GitHub et Google via NextAuth
 * Réinitialisation de mot de passe par email
-* Emails envoyés via SMTP Gmail
+* Emails envoyés via SMTP Gmail ou Resend
+* Formulaire de contact
+* Protection par Captcha (reCAPTCHA)
 * ORM via Prisma avec MySQL
+* Cache ou sessions via Redis
