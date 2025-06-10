@@ -64,21 +64,6 @@ export default function EditPost({ post }: Props) {
   const router = useRouter();
   const [accessDenied, setAccessDenied] = useState(false);
 
-  useEffect(() => {
-    if (isAdmin === false) {
-      setAccessDenied(true); // Affiche la page 403 personnalisée
-
-      const timeout = setTimeout(() => {
-        router.replace("/");
-      }, 3000); // redirige après 3 secondes
-
-      return () => clearTimeout(timeout);
-    }
-  }, [isAdmin]);
-
-  if (isAdmin === null) return <Loader />;
-  if (accessDenied) return <AccessDenied/>;
-
   const [title, setTitle] = useState(post.title);
   const [content, setContent] = useState(post.content);
   const [category, setCategory] = useState(post.category);
@@ -93,6 +78,21 @@ export default function EditPost({ post }: Props) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(post.pdfUrl || null);
   const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isAdmin === false) {
+      setAccessDenied(true); // Affiche la page 403 personnalisée
+
+      const timeout = setTimeout(() => {
+        router.replace("/");
+      }, 3000); // redirige après 3 secondes
+
+      return () => clearTimeout(timeout);
+    }
+  }, [isAdmin]);
+
+  if (isAdmin === null) return <Loader />;
+  if (accessDenied) return <AccessDenied/>;
 
   const isValidFile = (file: File, allowedExtensions: string[], allowedMimeTypes: string[]) => {
     const fileExtension = file.name.split('.').pop()?.toLowerCase();

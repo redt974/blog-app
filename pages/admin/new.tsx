@@ -13,6 +13,14 @@ export default function NewPost() {
   const router = useRouter()
   const [accessDenied, setAccessDenied] = useState(false);
 
+  const [title, setTitle] = useState("")
+  const [content, setContent] = useState("")
+  const [category, setCategory] = useState("")
+  const [image, setImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [pdf, setPdf] = useState<File | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   useEffect(() => {
     if (isAdmin === false) {
       setAccessDenied(true); // Affiche la page 403 personnalisée
@@ -27,14 +35,6 @@ export default function NewPost() {
 
   if (isAdmin === null) return <Loader />;
   if (accessDenied) return <AccessDenied />;
-
-  const [title, setTitle] = useState("")
-  const [content, setContent] = useState("")
-  const [category, setCategory] = useState("")
-  const [image, setImage] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [pdf, setPdf] = useState<File | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const isValidFile = (file: File, allowedExtensions: string[], allowedMimeTypes: string[]) => {
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
