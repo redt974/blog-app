@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { transporter } from "@/lib/mailer";
+import { resend } from '@/lib/resend'
 import { randomBytes } from "crypto";
 import { NextApiRequest, NextApiResponse } from "next";
 import { passwordResetTemplate } from "@/templates/forgot-password";
@@ -73,8 +73,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
     });
 
-    await transporter.sendMail({
-        from: `"MonApp" <${process.env.GMAIL_USER}>`,
+    const from = `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_FROM_ADDRESS}>`
+      await resend.emails.send({
+	    from,
         to: email,
         subject,
         html,

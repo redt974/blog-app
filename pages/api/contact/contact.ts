@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
-import { transporter } from "@/lib/mailer"
 import { contactMessageTemplate } from "@/templates/contact-message"
 import { getAuthUser } from "@/lib/auth" // ✅ Ajouté
+import { resend } from '@/lib/resend'
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end()
@@ -30,8 +30,9 @@ export default async function handler(req, res) {
     const { subject, html } = contactMessageTemplate(name, object, email, message)
 
     // Envoie l'e-mail au destinataire
-    await transporter.sendMail({
-      from: `"Formulaire Contact" <${process.env.GMAIL_USER}>`,
+     const from = `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_FROM_ADDRESS}>`
+      await resend.emails.send({
+      from,
       to: process.env.CONTACT_TO_EMAIL!,
       subject,
       html,
