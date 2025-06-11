@@ -4,7 +4,7 @@ import { randomBytes } from "crypto";
 import { NextApiRequest, NextApiResponse } from "next";
 import { passwordResetTemplate } from "@/templates/forgot-password";
 import { verifyCaptcha } from "@/lib/captcha";
-import { redis } from "@/lib/redis";
+import redis from "@/lib/redis";
 
 const MAX_ATTEMPTS = 3;
 const BLOCK_DURATION = 60 * 15; // 15 minutes

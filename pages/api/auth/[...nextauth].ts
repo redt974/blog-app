@@ -4,7 +4,7 @@ import GitHubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
-import { redis } from "@/lib/redis"
+import redis from "@/lib/redis"
 import bcrypt from "bcryptjs"
 import { verifyCaptcha } from "@/lib/captcha"
 

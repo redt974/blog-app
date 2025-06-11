@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { isAdminFromSession } from "@/lib/auth/is-admin";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]";
-import { redis } from "@/lib/redis";
+import redis from "@/lib/redis";
 
 const MAX_ATTEMPTS = 5;
 const BLOCK_DURATION = 300; // 5 minutes en secondes

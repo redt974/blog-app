@@ -12,12 +12,16 @@ npm install
 
 ```bash
 npx prisma generate
-npx prisma migrate dev --name init
+npx prisma migrate dev
 ```
 
-3. **Créer le fichier `.env` à la racine :**
+3. **Créer le fichier `.env` à la racine ou renomme le fichier `.env-default` en `.env`:**
 
 ```env
+# Environnement
+NODE_ENV=development
+# NODE_ENV=production
+
 DATABASE_URL="mysql://root:@localhost:3306/blog-app"
 
 # Admin credentials
@@ -47,8 +51,12 @@ EMAIL_FROM_ADDRESS="onboarding@resend.dev"
 # Contact
 CONTACT_TO_EMAIL=
 
-# Redis
+# Redis (For development only)
 REDIS_URL=redis://localhost:6379
+
+# Redis (For production)
+UPSTASH_REDIS_URL=https://[your-projet].upstash.io
+UPSTASH_REDIS_SECRET=
 ```
 
 ---
@@ -227,6 +235,25 @@ EMAIL_FROM_ADDRESS="onboarding@resend.dev"
 CONTACT_TO_EMAIL=ton.email@exemple.com
 ```
 Ce champ est utilisé pour envoyer les messages du formulaire de contact.
+
+---
+
+## 🛑 Configuration de la BDD Redis :
+
+1. Va sur https://upstash.com et crée un compte
+
+2. Crée une base de données depuis ton tableau de bord Upstash
+
+3. Renseigne les informations nécessaires et clique sur créer
+
+* Renseigne l’url de connexion Redis dans le .env :
+
+```env
+# Redis (For production)
+UPSTASH_REDIS_URL=https://[your-projet].upstash.io
+UPSTASH_REDIS_SECRET=
+```
+⚠️ Assure-toi d’avoir préciser le chiffrement TLS pour une connexion avec [Redis Insight](https://redis.io/insight/)
 
 ---
 
