@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import { Pencil, Trash2, Image as ImageIcon } from "lucide-react";
 import Loader from "@/components/Loader";
 import { toast } from "react-toastify";
-import AccessDenied from "@/pages/403";
+import AccessDenied from "@/pages/error/403";
 
 type Props = {
   post: {

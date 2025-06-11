@@ -22,7 +22,11 @@ npx prisma migrate dev
 NODE_ENV=development
 # NODE_ENV=production
 
-DATABASE_URL="mysql://root:@localhost:3306/blog-app"
+# For development only
+# DATABASE_URL="mysql://root:@localhost:3306/blog-app"
+
+# For production, use the following Neon database URL:
+DATABASE_URL=""
 
 # Admin credentials
 ADMIN_EMAIL_HASH=
@@ -58,6 +62,44 @@ REDIS_URL=redis://localhost:6379
 UPSTASH_REDIS_URL=https://[your-projet].upstash.io
 UPSTASH_REDIS_TOKEN=
 ```
+
+---
+
+## 🗄️ Configuration de la base de données PostgreSQL avec Neon
+
+1. Va sur [Neon](https://neon.tech) et crée un compte (ou connecte-toi).
+
+2. Clique sur **"New Project"**.
+
+3. Remplis les champs suivants :
+
+   * **Project name** : `site-club-pierrelaye-db` (ou un autre nom)
+   * **PostgreSQL version** : garde la version par défaut
+   * Clique sur **"Create project"**
+
+4. Une fois le projet créé :
+
+   * Va dans l’onglet **"Connection Details"**
+   * Copie la **connection string (avec mot de passe)**
+
+   Exemple :
+
+   ```
+   postgres://nom_utilisateur:mot_de_passe@nom_hôte/db_nom?sslmode=require
+   ```
+
+5. Dans ton fichier `.env.local`, ajoute la ligne suivante :
+
+   ```env
+   DATABASE_URL=postgres://nom_utilisateur:mot_de_passe@nom_hôte/db_nom?sslmode=require
+   ```
+
+6. (Optionnel) Si tu utilises **Prisma**, lance les commandes suivantes :
+
+   ```bash
+   npx prisma db push
+   npx prisma generate
+   ```
 
 ---
 

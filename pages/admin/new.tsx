@@ -6,7 +6,7 @@ import Loader from "@/components/Loader";
 import { motion } from "framer-motion"
 import { toast } from 'react-toastify'
 import { PlusCircle, Image as ImageIcon } from "lucide-react"
-import AccessDenied from "@/pages/403";
+import AccessDenied from "@/pages/error/403";
 
 export default function NewPost() {
   const isAdmin = useIsAdmin();
