@@ -4,7 +4,7 @@ import GitHubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
-import redis from "@/lib/redis"
+import { redis } from "@/lib/redis"
 import bcrypt from "bcryptjs"
 import { verifyCaptcha } from "@/lib/captcha"
 
@@ -63,7 +63,7 @@ export const authOptions = {
           }
 
           if (attempts >= MAX_ATTEMPTS) {
-            await redis.set(blockKey, "1", "EX", BLOCK_DURATION);
+            await redis.set(blockKey, "1", { ex: BLOCK_DURATION });
             throw new Error("Compte temporairement bloqué suite à plusieurs tentatives.");
           }
 

@@ -56,7 +56,7 @@ REDIS_URL=redis://localhost:6379
 
 # Redis (For production)
 UPSTASH_REDIS_URL=https://[your-projet].upstash.io
-UPSTASH_REDIS_SECRET=
+UPSTASH_REDIS_TOKEN=
 ```
 
 ---
@@ -251,7 +251,7 @@ Ce champ est utilisé pour envoyer les messages du formulaire de contact.
 ```env
 # Redis (For production)
 UPSTASH_REDIS_URL=https://[your-projet].upstash.io
-UPSTASH_REDIS_SECRET=
+UPSTASH_REDIS_TOKEN=
 ```
 ⚠️ Assure-toi d’avoir préciser le chiffrement TLS pour une connexion avec [Redis Insight](https://redis.io/insight/)
 

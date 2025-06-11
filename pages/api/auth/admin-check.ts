@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { isAdminFromSession } from "@/lib/auth/is-admin";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]";
-import redis from "@/lib/redis";
+import { redis } from "@/lib/redis";
 
 const MAX_ATTEMPTS = 5;
 const BLOCK_DURATION = 300; // 5 minutes en secondes
@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const email = session?.user?.email;
 
   if (!email) {
-    return res.status(200).json({reason: "unauthenticated" });
+    return res.status(200).json({ reason: "unauthenticated" });
   }
 
   const failKey = `admin:fail:${email}`;
@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (attempts >= MAX_ATTEMPTS) {
-      await redis.set(blockKey, "1", "EX", BLOCK_DURATION);
+      await redis.set(blockKey, "1", { ex: BLOCK_DURATION });
       return res.status(403).end();
     }
 

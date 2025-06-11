@@ -4,7 +4,7 @@ import { randomBytes } from "crypto";
 import { NextApiRequest, NextApiResponse } from "next";
 import { passwordResetTemplate } from "@/templates/forgot-password";
 import { verifyCaptcha } from "@/lib/captcha";
-import redis from "@/lib/redis";
+import { redis } from "@/lib/redis";
 
 const MAX_ATTEMPTS = 3;
 const BLOCK_DURATION = 60 * 15; // 15 minutes
@@ -52,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (attempts >= MAX_ATTEMPTS) {
-        await redis.set(blockKey, "1", "EX", BLOCK_DURATION);
+        await redis.set(blockKey, "1", { ex: BLOCK_DURATION });
         return res.status(429).json({ message: "Trop de tentatives. Réessaie plus tard." });
     }
 
@@ -74,8 +74,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     const from = `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_FROM_ADDRESS}>`
-      await resend.emails.send({
-	    from,
+    await resend.emails.send({
+        from,
         to: email,
         subject,
         html,
