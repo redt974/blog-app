@@ -6,7 +6,8 @@ export default function ResetPasswordPage() {
   const router = useRouter()
   const { token, email } = router.query
 
-  const [password, setPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [isValid, setIsValid] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -21,14 +22,19 @@ export default function ResetPasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    toast.error(null)
-    toast.success(null)
+    toast.dismiss();
 
     try {
+      if (!newPassword || !confirmPassword || newPassword !== confirmPassword) {
+        toast.error("Les mots de passe ne correspondent pas ou sont vides.")
+        setLoading(false)
+        return
+      }
+    
       const res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, email, password }),
+        body: JSON.stringify({ token, email, newPassword }),
       })
 
       const data = await res.json()
@@ -89,8 +95,23 @@ export default function ResetPasswordPage() {
             <input
               id="password"
               type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
+              value={newPassword}
+              onChange={e => setNewPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all duration-200 placeholder:text-gray-400 text-gray-800"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Confirmer le mot de passe
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
               placeholder="••••••••"
               required
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all duration-200 placeholder:text-gray-400 text-gray-800"

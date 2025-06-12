@@ -57,7 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Appliquer cooldown avant d’envoyer un nouveau mail
-    await redis.set(cooldownKey, "1", "EX", COOLDOWN_DURATION);
+    await redis.set(cooldownKey, "1", { ex: COOLDOWN_DURATION});
 
     const token = randomBytes(32).toString("hex");
     const expires = new Date(Date.now() + 1000 * 60 * 60); // 1h
