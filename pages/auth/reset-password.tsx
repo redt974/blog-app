@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/router"
 import { toast } from 'react-toastify'
+import Captcha from "@/components/Captcha"
 
 export default function ResetPasswordPage() {
   const router = useRouter()
@@ -8,6 +9,7 @@ export default function ResetPasswordPage() {
 
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [captcha, setCaptcha] = useState<string | null>(null);
   const [isValid, setIsValid] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -30,11 +32,11 @@ export default function ResetPasswordPage() {
         setLoading(false)
         return
       }
-    
+
       const res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, email, newPassword }),
+        body: JSON.stringify({ token, email, newPassword, captcha }),
       })
 
       const data = await res.json()
@@ -118,8 +120,11 @@ export default function ResetPasswordPage() {
             />
           </div>
 
+          <Captcha onVerify={setCaptcha} />
+
           <button
             type="submit"
+            disabled={!captcha || loading}
             className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 focus:outline-none transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 active:translate-y-0"
           >
             {loading ? "Réinitialisation..." : "Réinitialiser le mot de passe"}
