@@ -15,8 +15,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ reason: "unauthenticated" });
   }
 
-  const failKey = `admin:fail:${email}`;
-  const blockKey = `admin:block:${email}`;
+  // Extract client IP from req (normalize IPv4-mapped IPv6)
+  const forwarded = req.headers["x-forwarded-for"];
+  let ip = typeof forwarded === "string"
+    ? forwarded.split(",")[0].trim()
+    : req.socket.remoteAddress || "";
+
+  if (ip.startsWith("::ffff:")) {
+    ip = ip.slice(7);
+  }
+
+  const failKey = `admin:fail:${email}:${ip}`;
+  const blockKey = `admin:block:${email}:${ip}`;
 
   const isBlocked = await redis.exists(blockKey);
   if (isBlocked) {

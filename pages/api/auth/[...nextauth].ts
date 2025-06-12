@@ -36,13 +36,25 @@ export const authOptions = {
 
         if (!email || !password || !captcha) throw new Error("Champs requis manquants");
 
+        // Extract client IP from req (normalize IPv4-mapped IPv6)
+        const forwarded = req.headers?.["x-forwarded-for"];
+        let ip = typeof forwarded === "string"
+          ? forwarded.split(",")[0].trim()
+          : (req.headers?.["x-real-ip"] as string) || "unknown";
+          
+        if (ip.startsWith("::ffff:")) {
+          ip = ip.slice(7);
+        }
+
+        // Verify captcha
         const isHuman = await verifyCaptcha(captcha);
         if (!isHuman.success || isHuman.score < 0.5) {
           throw new Error("Échec de la vérification captcha.");
         }
 
-        const failKey = `login:fail:${email}`;
-        const blockKey = `login:block:${email}`;
+        // Use both email and IP for rate limiting keys
+        const failKey = `login:fail:${email}:${ip}`;
+        const blockKey = `login:block:${email}:${ip}`;
 
         const isBlocked = await redis.exists(blockKey);
         if (isBlocked) {
@@ -74,9 +86,12 @@ export const authOptions = {
           throw new Error("Email non vérifié");
         }
 
-        // Succès : reset des compteurs
+        // Success: reset fail and block counters for this email+IP
         await redis.del(failKey);
         await redis.del(blockKey);
+
+        // Log the IP somewhere, for audit or analytics
+        await prisma.loginLog.create({ data: { userId: user.id, ip, timestamp: new Date() } });
 
         return user;
       },

@@ -3,6 +3,7 @@ import { hash } from "bcryptjs"
 import { NextApiRequest, NextApiResponse } from "next"
 import { resend } from '@/lib/resend'
 import { passwordResetConfirmationTemplate } from "@/templates/reset-password"
+import { verifyCaptcha } from "@/lib/captcha"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -13,6 +14,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (!token || !email || !password || !captcha) {
     return res.status(400).json({ message: "Champs manquants." })
+  }
+
+  const isHuman = await verifyCaptcha(captcha);
+  if (!isHuman.success || isHuman.score < 0.5) {
+    return res.status(400).json({ message: "Échec de la vérification captcha." });
   }
 
   // Vérifie le token

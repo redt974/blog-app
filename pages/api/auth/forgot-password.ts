@@ -23,9 +23,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ message: "Échec de la vérification captcha." });
     }
 
-    const blockKey = `reset:block:${email}`;
+    // Extract client IP from req (normalize IPv4-mapped IPv6)
+    const forwarded = req.headers["x-forwarded-for"];
+    let ip = typeof forwarded === "string"
+        ? forwarded.split(",")[0].trim()
+        : req.socket.remoteAddress || "";
+
+    if (ip.startsWith("::ffff:")) {
+        ip = ip.slice(7);
+    }
+
+    const blockKey = `reset:block:${email}:${ip}`;
     const cooldownKey = `reset:cooldown:${email}`;
-    const attemptsKey = `reset:attempts:${email}`;
+    const attemptsKey = `reset:attempts:${email}:${ip}`;
 
     const isBlocked = await redis.exists(blockKey);
     if (isBlocked) {
