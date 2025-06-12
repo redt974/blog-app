@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { Lock, Check, X } from "lucide-react";
+import Captcha from "@/components/Captcha";
 
 interface PasswordRequirements {
   length: boolean;
@@ -15,6 +16,7 @@ export default function ResetPasswordPage() {
   const router = useRouter();
   const { token, email } = router.query;
 
+  const [captcha, setCaptcha] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isValid, setIsValid] = useState(false);
@@ -89,7 +91,7 @@ export default function ResetPasswordPage() {
       const res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, email, newPassword }),
+        body: JSON.stringify({ token, email, password: newPassword , captcha}),
       });
 
       const data = await res.json();
