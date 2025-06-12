@@ -40,7 +40,7 @@ export default function SettingsPage() {
       <div className="sticky top-0 z-50 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 relative p-4 flex justify-between items-center">
         <Link
           href="/"
-          className="flex items-center space-x-2 text-white transform hover:scale-105 transition-transform duration-200"
+          className="flex items-center space-x-2 text-white  transition-transform duration-200"
           rel="stylesheet"
         >
           <img
