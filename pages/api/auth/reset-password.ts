@@ -9,9 +9,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: "Méthode non autorisée." })
   }
 
-  const { token, email, password } = req.body
+  const { token, email, password, captcha } = req.body
 
-  if (!token || !email || !password) {
+  if (!token || !email || !password || !captcha) {
     return res.status(400).json({ message: "Champs manquants." })
   }
 
@@ -22,6 +22,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (!resetToken || resetToken.email !== email || resetToken.expires < new Date()) {
     return res.status(400).json({ message: "Lien invalide ou expiré." })
+  }
+
+  // Vérifie le format de l'email
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#!%&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({ message: "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial." });
   }
 
   // Hash du nouveau mot de passe

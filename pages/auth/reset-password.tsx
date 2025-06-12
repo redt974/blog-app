@@ -85,6 +85,7 @@ export default function ResetPasswordPage() {
         return;
       }
 
+
       const res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -251,6 +252,8 @@ export default function ResetPasswordPage() {
             />
             </div>
           </div>
+
+          <Captcha onVerify={setCaptcha} />
 
           <button
             type="submit"

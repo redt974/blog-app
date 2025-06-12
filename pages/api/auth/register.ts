@@ -23,6 +23,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: "Cet email est déjà utilisé." })
   }
 
+  // Vérifie le format de l'email
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#!%&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({ message: "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial." });
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10)
 
   const user = await prisma.user.create({
