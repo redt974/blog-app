@@ -24,14 +24,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Extract client IP from req (normalize IPv4-mapped IPv6)
-    const forwarded = req.headers["x-forwarded-for"];
-    let ip = typeof forwarded === "string"
-        ? forwarded.split(",")[0].trim()
-        : req.socket.remoteAddress || "";
+    function getClientIp(req: NextApiRequest): string {
+        const xRealIp = req.headers["x-real-ip"];
+        const xForwardedFor = req.headers["x-forwarded-for"];
+        const remoteAddr = req.socket?.remoteAddress;
 
-    if (ip.startsWith("::ffff:")) {
-        ip = ip.slice(7);
+        let ip =
+            typeof xRealIp === "string" && xRealIp
+                ? xRealIp
+                : typeof xForwardedFor === "string" && xForwardedFor
+                    ? xForwardedFor.split(",")[0].trim()
+                    : remoteAddr || "unknown";
+
+        if (ip.startsWith("::ffff:")) {
+            ip = ip.slice(7);
+        }
+
+        return ip;
     }
+
+    const ip = getClientIp(req);
 
     const blockKey = `reset:block:${email}:${ip}`;
     const cooldownKey = `reset:cooldown:${email}`;
@@ -67,7 +79,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Appliquer cooldown avant d’envoyer un nouveau mail
-    await redis.set(cooldownKey, "1", { ex: COOLDOWN_DURATION});
+    await redis.set(cooldownKey, "1", { ex: COOLDOWN_DURATION });
 
     const token = randomBytes(32).toString("hex");
     const expires = new Date(Date.now() + 1000 * 60 * 60); // 1h
