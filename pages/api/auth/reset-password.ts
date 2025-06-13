@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { hash } from "bcryptjs"
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { NextApiRequest, NextApiResponse } from "next"
 import { resend } from '@/lib/resend'
 import { passwordResetConfirmationTemplate } from "@/templates/reset-password"
@@ -10,6 +12,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: "Méthode non autorisée." })
   }
 
+  const session = await getServerSession(req, res, authOptions);
+  if (session) {
+    return res.status(403).json({ message: "Déjà connecté." });
+  }
+  
   const { token, email, password, captcha } = req.body
 
   if (!token || !email || !password || !captcha) {

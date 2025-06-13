@@ -1,12 +1,18 @@
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { GithubIcon, Mail, Lock } from "lucide-react";
 import { toast } from 'react-toastify'
 import Captcha from "@/components/Captcha";
+import Loader from "@/components/Loader";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { status } = useSession(); // `status` can be "loading", "authenticated", or "unauthenticated"
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [captcha, setCaptcha] = useState<string | null>(null);
@@ -25,7 +31,7 @@ export default function LoginPage() {
       toast.error(response.error);
       return;
     } else {
-      window.location.href = "/"; 
+      window.location.href = "/";
     }
   };
 
@@ -43,6 +49,15 @@ export default function LoginPage() {
   const errorMessage = error
     ? errorMessages[error] || errorMessages.default
     : "";
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/"); // Redirect to home if already logged in
+    }
+  }, [status, router]);
+
+  if (status === "loading") return <Loader />;
+  if (status === "authenticated") return null; // Prevent rendering if already authenticated
 
   if (error) toast.error(errorMessage);
 
@@ -92,15 +107,15 @@ export default function LoginPage() {
             </div>
             <div className="text-right">
               <a
-              href="/auth/forgot-password"
-              className="text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Mot de passe oublié ?
-            </a>
+                href="/auth/forgot-password"
+                className="text-blue-600 hover:text-blue-800 font-medium"
+              >
+                Mot de passe oublié ?
+              </a>
             </div>
           </div>
 
-          <Captcha onVerify={setCaptcha}/>
+          <Captcha onVerify={setCaptcha} />
 
           <motion.button
             type="submit"
@@ -122,9 +137,9 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-3 pt-3">
-            <button 
+            <button
               type="button"
-               onClick={() => signIn("google", { callbackUrl: "/" })}
+              onClick={() => signIn("google", { callbackUrl: "/" })}
               className="w-full flex justify-center items-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
               <svg width="20" height="20" viewBox="0 0 48 48">

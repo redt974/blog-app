@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma"
 import { redis } from "@/lib/redis"
 import bcrypt from "bcryptjs"
 import { verifyCaptcha } from "@/lib/captcha"
+import { NextApiRequest } from "next"
 
 const MAX_ATTEMPTS = 5;
 const BLOCK_DURATION = 60 * 5; // 5 minutes
@@ -35,26 +36,6 @@ export const authOptions = {
         const captcha = credentials?.captcha;
 
         if (!email || !password || !captcha) throw new Error("Champs requis manquants");
-
-        // Extract client IP from req (normalize IPv4-mapped IPv6)
-        function getClientIp(req: NextApiRequest): string {
-          const xRealIp = req.headers["x-real-ip"];
-          const xForwardedFor = req.headers["x-forwarded-for"];
-          const remoteAddr = req.socket?.remoteAddress;
-
-          let ip =
-            typeof xRealIp === "string" && xRealIp
-              ? xRealIp
-              : typeof xForwardedFor === "string" && xForwardedFor
-                ? xForwardedFor.split(",")[0].trim()
-                : remoteAddr || "unknown";
-
-          if (ip.startsWith("::ffff:")) {
-            ip = ip.slice(7);
-          }
-
-          return ip;
-        }
 
         const ip = getClientIp(req);
 
@@ -202,3 +183,23 @@ export const authOptions = {
 }
 
 export default NextAuth(authOptions)
+
+// Extract client IP from req (normalize IPv4-mapped IPv6)
+function getClientIp(req: NextApiRequest): string {
+  const xRealIp = req.headers["x-real-ip"];
+  const xForwardedFor = req.headers["x-forwarded-for"];
+  const remoteAddr = req.socket?.remoteAddress;
+
+  let ip =
+    typeof xRealIp === "string" && xRealIp
+      ? xRealIp
+      : typeof xForwardedFor === "string" && xForwardedFor
+        ? xForwardedFor.split(",")[0].trim()
+        : remoteAddr || "unknown";
+
+  if (ip.startsWith("::ffff:")) {
+    ip = ip.slice(7);
+  }
+
+  return ip;
+}

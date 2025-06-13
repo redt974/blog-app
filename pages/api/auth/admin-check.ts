@@ -12,27 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const email = session?.user?.email;
 
   if (!email) {
-    return res.status(200).json({ reason: "unauthenticated" });
-  }
-
-  // Extract client IP from req (normalize IPv4-mapped IPv6)
-  function getClientIp(req: NextApiRequest): string {
-    const xRealIp = req.headers["x-real-ip"];
-    const xForwardedFor = req.headers["x-forwarded-for"];
-    const remoteAddr = req.socket?.remoteAddress;
-
-    let ip =
-      typeof xRealIp === "string" && xRealIp
-        ? xRealIp
-        : typeof xForwardedFor === "string" && xForwardedFor
-          ? xForwardedFor.split(",")[0].trim()
-          : remoteAddr || "unknown";
-
-    if (ip.startsWith("::ffff:")) {
-      ip = ip.slice(7);
-    }
-
-    return ip;
+    return res.status(404).end(); // Hide this route's existence
   }
 
   const ip = getClientIp(req);
@@ -42,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const isBlocked = await redis.exists(blockKey);
   if (isBlocked) {
-    return res.status(429).end();
+    return res.status(404).end(); // Pretend this route doesn’t exist
   }
 
   const isAdmin = await isAdminFromSession(req, res);
@@ -56,10 +36,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (attempts >= MAX_ATTEMPTS) {
       await redis.set(blockKey, "1", { ex: BLOCK_DURATION });
-      return res.status(403).end();
     }
 
-    return res.status(403).end();
+    return res.status(404).end(); // Stealth fail
   }
 
   // Si c’est un admin légitime, on efface ses erreurs
@@ -67,4 +46,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   await redis.del(blockKey);
 
   return res.status(200).json({ isAdmin: true });
+}
+
+// Extract client IP from req (normalize IPv4-mapped IPv6)
+function getClientIp(req: NextApiRequest): string {
+  const xRealIp = req.headers["x-real-ip"];
+  const xForwardedFor = req.headers["x-forwarded-for"];
+  const remoteAddr = req.socket?.remoteAddress;
+
+  let ip =
+    typeof xRealIp === "string" && xRealIp
+      ? xRealIp
+      : typeof xForwardedFor === "string" && xForwardedFor
+        ? xForwardedFor.split(",")[0].trim()
+        : remoteAddr || "unknown";
+
+  if (ip.startsWith("::ffff:")) {
+    ip = ip.slice(7);
+  }
+
+  return ip;
 }

@@ -1,10 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from 'react-toastify'
 import Captcha from "@/components/Captcha";
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+import Loader from "@/components/Loader";
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
+  const { status } = useSession(); // `status` can be "loading", "authenticated", or "unauthenticated"
+
   const [email, setEmail] = useState("");
   const [captcha, setCaptcha] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/"); // Redirect to home if already logged in
+    }
+  }, [status, router]);
+
+  if (status === "loading") return <Loader />;
+  if (status === "authenticated") return null; // Prevent rendering if already authenticated
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

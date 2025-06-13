@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+import Loader from "@/components/Loader";
 import { toast } from "react-toastify";
 import { Lock, Check, X } from "lucide-react";
 import Captcha from "@/components/Captcha";
@@ -14,6 +16,7 @@ interface PasswordRequirements {
 
 export default function ResetPasswordPage() {
   const router = useRouter();
+  const { status } = useSession(); // `status` can be "loading", "authenticated", or "unauthenticated"
   const { token, email } = router.query;
 
   const [captcha, setCaptcha] = useState<string | null>(null);
@@ -61,6 +64,15 @@ export default function ResetPasswordPage() {
   const isPasswordValid =
     Object.values(requirements).filter(Boolean).length >= 3 &&
     requirements.length;
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/"); // Redirect to home if already logged in
+    }
+  }, [status, router]);
+
+  if (status === "loading") return <Loader />;
+  if (status === "authenticated") return null; // Prevent rendering if already authenticated
 
   useEffect(() => {
     if (typeof token === "string" && typeof email === "string") {

@@ -1,12 +1,19 @@
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { randomBytes } from "crypto"
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { NextApiRequest, NextApiResponse } from "next"
 import { verifyCaptcha } from "@/lib/captcha";
 import { sendVerificationEmail } from "@/lib/resend"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end()
+
+  const session = await getServerSession(req, res, authOptions);
+  if (session) {
+    return res.status(403).json({ message: "Déjà connecté." });
+  }
 
   const { name, email, password, captcha } = req.body
   if (!email || !password || !captcha) {

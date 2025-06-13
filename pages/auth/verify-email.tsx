@@ -1,13 +1,25 @@
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
-import { signIn } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
+import Loader from "@/components/Loader";
 
 export default function VerifyEmailPage() {
-  const router = useRouter()
+  const router = useRouter();
+  const { status } = useSession(); // `status` can be "loading", "authenticated", or "unauthenticated"
+
   const { token, email } = router.query
-  const [status, setStatus] = useState("Vérification...")
+  const [checkStatus, setCheckStatus] = useState("Vérification...")
   const [verificationState, setVerificationState] = useState<'verifying' | 'success' | 'error'>('verifying');
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/"); // Redirect to home if already logged in
+    }
+  }, [status, router]);
+
+  if (status === "loading") return <Loader />;
+  if (status === "authenticated") return null; // Prevent rendering if already authenticated
 
   useEffect(() => {
     if (token && email) {
@@ -18,10 +30,10 @@ export default function VerifyEmailPage() {
       }).then(async (res) => {
         const data = await res.json()
         if (res.ok) {
-          setStatus("Adresse email vérifiée ! Vous pouvez maintenant vous connecter.")
+          setCheckStatus("Adresse email vérifiée ! Vous pouvez maintenant vous connecter.")
           setVerificationState('success');
         } else {
-          setStatus(data.message || "Erreur de vérification.")
+          setCheckStatus(data.message || "Erreur de vérification.")
           setVerificationState('error');
         }
       })
@@ -68,7 +80,7 @@ export default function VerifyEmailPage() {
             verificationState === 'success' ? 'text-green-700' : 
             'text-red-700'
           }`}>
-            {status}
+            {checkStatus}
           </p>
           
           {verificationState === 'success' && (

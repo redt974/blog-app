@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, User, Github, Check, X } from "lucide-react";
+import { useSession } from "next-auth/react";
+import Loader from "@/components/Loader";
 import { signIn } from "next-auth/react";
 import { toast } from "react-toastify";
 import Captcha from "@/components/Captcha";
@@ -14,6 +16,9 @@ interface PasswordRequirements {
 }
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const { status } = useSession(); // `status` can be "loading", "authenticated", or "unauthenticated"
+
   const [loading, setLoading] = useState(false);
   const [captcha, setCaptcha] = useState<string | null>(null);
   const [password, setPassword] = useState("");
@@ -26,7 +31,6 @@ export default function RegisterPage() {
     number: false,
     special: false,
   });
-  const router = useRouter();
 
   const validatePassword = (pwd: string) => {
     const newRequirements = {
@@ -58,6 +62,16 @@ export default function RegisterPage() {
   const isPasswordValid =
     Object.values(requirements).filter(Boolean).length >= 3 &&
     requirements.length;
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/"); // Redirect to home if already logged in
+    }
+  }, [status, router]);
+
+  if (status === "loading") return <Loader />;
+  if (status === "authenticated") return null; // Prevent rendering if already authenticated
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -163,13 +177,12 @@ export default function RegisterPage() {
                 onFocus={handlePasswordFocus}
                 onBlur={handlePasswordBlur}
                 required
-                className={`w-full py-3 px-10 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
-                  password && isPasswordValid 
-                    ? 'border-green-300 focus:ring-green-500' 
-                    : password 
-                    ? 'border-red-300 focus:ring-red-500' 
-                    : 'border-gray-300 focus:ring-blue-500'
-                }`}
+                className={`w-full py-3 px-10 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-all ${password && isPasswordValid
+                    ? 'border-green-300 focus:ring-green-500'
+                    : password
+                      ? 'border-red-300 focus:ring-red-500'
+                      : 'border-gray-300 focus:ring-blue-500'
+                  }`}
               />
             </div>
 
@@ -178,31 +191,31 @@ export default function RegisterPage() {
               <div className="absolute left-full top-0 ml-4 w-80 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-50 animate-in slide-in-from-left-2 duration-200">
                 <div className="absolute left-0 top-4 w-0 h-0 border-t-8 border-b-8 border-r-8 border-transparent border-r-white -ml-2"></div>
                 <div className="absolute left-0 top-4 w-0 h-0 border-t-8 border-b-8 border-r-8 border-transparent border-r-gray-200 -ml-2.5"></div>
-                
+
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Exigences du mot de passe</h3>
                 <div className="space-y-3">
-                  <RequirementItem 
-                    met={requirements.length} 
-                    text="Au moins 8 caractères" 
+                  <RequirementItem
+                    met={requirements.length}
+                    text="Au moins 8 caractères"
                   />
-                  <RequirementItem 
-                    met={requirements.uppercase} 
-                    text="Une lettre majuscule (A-Z)" 
+                  <RequirementItem
+                    met={requirements.uppercase}
+                    text="Une lettre majuscule (A-Z)"
                   />
-                  <RequirementItem 
-                    met={requirements.lowercase} 
-                    text="Une lettre minuscule (a-z)" 
+                  <RequirementItem
+                    met={requirements.lowercase}
+                    text="Une lettre minuscule (a-z)"
                   />
-                  <RequirementItem 
-                    met={requirements.number} 
-                    text="Un chiffre (0-9)" 
+                  <RequirementItem
+                    met={requirements.number}
+                    text="Un chiffre (0-9)"
                   />
-                  <RequirementItem 
-                    met={requirements.special} 
-                    text="Un caractère spécial (@, #, !, %, etc.)" 
+                  <RequirementItem
+                    met={requirements.special}
+                    text="Un caractère spécial (@, #, !, %, etc.)"
                   />
                 </div>
-                
+
                 {password && (
                   <div className="mt-4">
                     <div className="flex items-center gap-2">

@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { resend } from '@/lib/resend'
 import { randomBytes } from "crypto";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { NextApiRequest, NextApiResponse } from "next";
 import { passwordResetTemplate } from "@/templates/forgot-password";
 import { verifyCaptcha } from "@/lib/captcha";
@@ -13,6 +15,11 @@ const COOLDOWN_DURATION = 60 * 5; // 5 minutes entre deux emails
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "POST") return res.status(405).end();
 
+    const session = await getServerSession(req, res, authOptions);
+    if (session) {
+        return res.status(403).json({ message: "Déjà connecté." });
+    }
+
     const { email, captcha } = req.body;
     if (!email || !captcha) {
         return res.status(400).json({ message: "Email et captcha requis." });
@@ -21,26 +28,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const isHuman = await verifyCaptcha(captcha);
     if (!isHuman.success || isHuman.score < 0.5) {
         return res.status(400).json({ message: "Échec de la vérification captcha." });
-    }
-
-    // Extract client IP from req (normalize IPv4-mapped IPv6)
-    function getClientIp(req: NextApiRequest): string {
-        const xRealIp = req.headers["x-real-ip"];
-        const xForwardedFor = req.headers["x-forwarded-for"];
-        const remoteAddr = req.socket?.remoteAddress;
-
-        let ip =
-            typeof xRealIp === "string" && xRealIp
-                ? xRealIp
-                : typeof xForwardedFor === "string" && xForwardedFor
-                    ? xForwardedFor.split(",")[0].trim()
-                    : remoteAddr || "unknown";
-
-        if (ip.startsWith("::ffff:")) {
-            ip = ip.slice(7);
-        }
-
-        return ip;
     }
 
     const ip = getClientIp(req);
@@ -104,4 +91,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     return res.status(200).json(genericResponse);
+}
+
+// Extract client IP from req (normalize IPv4-mapped IPv6)
+function getClientIp(req: NextApiRequest): string {
+    const xRealIp = req.headers["x-real-ip"];
+    const xForwardedFor = req.headers["x-forwarded-for"];
+    const remoteAddr = req.socket?.remoteAddress;
+
+    let ip =
+        typeof xRealIp === "string" && xRealIp
+            ? xRealIp
+            : typeof xForwardedFor === "string" && xForwardedFor
+                ? xForwardedFor.split(",")[0].trim()
+                : remoteAddr || "unknown";
+
+    if (ip.startsWith("::ffff:")) {
+        ip = ip.slice(7);
+    }
+
+    return ip;
 }
